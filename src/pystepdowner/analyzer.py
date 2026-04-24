@@ -6,16 +6,15 @@ from pystepdowner.models import NodeChunk
 def get_calls(node: ast.AST, class_name: str | None) -> set[str]:
     calls = set()
     for child in ast.walk(node):
-        if isinstance(child, ast.Call):
-            if isinstance(child.func, ast.Name):
-                calls.add(child.func.id)
-            elif isinstance(child.func, ast.Attribute) and isinstance(child.func.value, ast.Name):
-                if child.func.value.id in ('self', 'cls') or (class_name and child.func.value.id == class_name):
-                    calls.add(child.func.attr)
+        if isinstance(child, ast.Name):
+            calls.add(child.id)
+        elif isinstance(child, ast.Attribute) and isinstance(child.value, ast.Name):
+            if child.value.id in ('self', 'cls') or (class_name and child.value.id == class_name):
+                calls.add(child.attr)
     return calls
 
 def extract_chunks(
-    nodes: list[ast.FunctionDef | ast.AsyncFunctionDef],
+    nodes: list[ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef],
     lines: list[str],
     prev_node_end_line: int,
     class_name: str | None
@@ -66,14 +65,12 @@ def extract_chunks(
 def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
     chunk_by_name = {c.name: c for c in chunks}
     
-    # Identify in-degrees to find roots
     in_degree: dict[str, int] = {c.name: 0 for c in chunks}
     for c in chunks:
         for call in c.calls:
             if call in in_degree:
                 in_degree[call] += 1
 
-    # Inits always go first
     inits = []
     others = []
     for c in chunks:
@@ -84,56 +81,82 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
             
     inits.sort(key=lambda c: 0 if c.name == '__init__' else 1)
     
+    in_degree: dict[str, int] = {c.name: 0 for c in others}
+    for c in others:
+        local_calls = [call for call in c.calls if call in chunk_by_name]
+        for call in local_calls:
+            in_degree[call] += 1
+            
     roots = [c for c in others if in_degree[c.name] == 0]
-    
-    # Sort roots by out-degree (number of local calls) descending
     roots.sort(key=lambda c: len([call for call in c.calls if call in chunk_by_name]), reverse=True)
     
-    ordered: list[NodeChunk] = []
-    visited: set[str] = set()
+    root_index_map = {c.name: 999999 for c in others}
+    level_map = {c.name: 999999 for c in others}
+    
+    for i, root in enumerate(roots):
+        queue_bfs = [(root.name, 0)]
+        visited_bfs = set()
+        while queue_bfs:
+            curr, depth = queue_bfs.pop(0)
+            
+            if i < root_index_map[curr]:
+                root_index_map[curr] = i
+                
+            if depth < level_map[curr]:
+                level_map[curr] = depth
+                
+            if curr in visited_bfs:
+                continue
+            visited_bfs.add(curr)
+            
+            c = chunk_by_name[curr]
+            queue_bfs.extend([(call, depth + 1) for call in c.calls if call in chunk_by_name])
 
-    def visit(c: NodeChunk) -> None:
-        if c.name in visited:
-            return
-        visited.add(c.name)
-        ordered.append(c)
-        
-        # Visit children in the order they appear in the AST calls, or alphabetically? 
-        # For simplicity and determinism, alphabetically.
-        local_calls = sorted([call for call in c.calls if call in chunk_by_name])
-        for call in local_calls:
-            visit(chunk_by_name[call])
-
-    for root in roots:
-        visit(root)
-        
-    # Any isolated cycles or unreachable functions
+    import heapq
+    queue: list[tuple[int, int, str, NodeChunk]] = []
     for c in others:
-        if c.name not in visited:
-            visit(c)
+        if in_degree[c.name] == 0:
+            heapq.heappush(queue, (root_index_map[c.name], level_map[c.name], c.name, c))
+            
+    ordered: list[NodeChunk] = []
+    while queue:
+        r_idx, lvl, name, c = heapq.heappop(queue)
+        ordered.append(c)
+        local_calls = [call for call in c.calls if call in chunk_by_name]
+        for call in local_calls:
+            in_degree[call] -= 1
+            if in_degree[call] == 0:
+                child_c = chunk_by_name[call]
+                heapq.heappush(queue, (root_index_map[call], level_map[call], call, child_c))
+
+    ordered_names = {c.name for c in ordered}
+    for c in others:
+        if c.name not in ordered_names:
+            ordered.append(c)
 
     return inits + ordered
 
 def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None = None) -> tuple[list[str], bool]:
-    groups = []
-    current_group = []
-    
     new_lines = lines[:]
     modified = False
 
     for stmt in body:
-        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        if isinstance(stmt, ast.ClassDef):
+            class_lines, class_mod = process_body(stmt.body, new_lines, class_name=stmt.name)
+            if class_mod:
+                new_lines = class_lines
+                modified = True
+
+    groups = []
+    current_group = []
+
+    for stmt in body:
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             current_group.append(stmt)
         else:
             if len(current_group) > 1:
                 groups.append(current_group)
             current_group = []
-            if isinstance(stmt, ast.ClassDef):
-                # Process class body recursively
-                class_lines, class_mod = process_body(stmt.body, new_lines, class_name=stmt.name)
-                if class_mod:
-                    new_lines = class_lines
-                    modified = True
 
     if len(current_group) > 1:
         groups.append(current_group)

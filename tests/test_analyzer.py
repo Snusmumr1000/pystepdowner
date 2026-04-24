@@ -3,115 +3,291 @@ import pytest
 from pystepdowner.analyzer import process_body
 
 def format_code(source: str) -> str:
+    source = source.strip('\n')
     lines = source.split('\n')
     tree = ast.parse(source)
     new_lines, modified = process_body(tree.body, lines)
-    return '\n'.join(new_lines)
+    return '\n'.join(new_lines).strip('\n')
 
 def test_valid_order():
-    source = (
-        "def a():\n"
-        "    b()\n"
-        "def b():\n"
-        "    pass\n"
-    )
-    assert format_code(source) == source
+    source = """
+def a():
+    b()
+def b():
+    pass
+"""
+    assert format_code(source) == source.strip('\n')
 
 def test_invalid_order_is_corrected():
-    source = (
-        "def b():\n"
-        "    pass\n"
-        "def a():\n"
-        "    b()\n"
-    )
-    expected = (
-        "def a():\n"
-        "    b()\n"
-        "def b():\n"
-        "    pass\n"
-    )
-    assert format_code(source) == expected
+    source = """
+def b():
+    pass
+def a():
+    b()
+"""
+    expected = """
+def a():
+    b()
+def b():
+    pass
+"""
+    assert format_code(source) == expected.strip('\n')
 
 def test_init_always_first():
-    source = (
-        "class A:\n"
-        "    def b(self):\n"
-        "        pass\n"
-        "    def __init__(self):\n"
-        "        self.b()\n"
-    )
-    expected = (
-        "class A:\n"
-        "    def __init__(self):\n"
-        "        self.b()\n"
-        "    def b(self):\n"
-        "        pass\n"
-    )
-    assert format_code(source) == expected
+    source = """
+class A:
+    def b(self):
+        pass
+    def __init__(self):
+        self.b()
+"""
+    expected = """
+class A:
+    def __init__(self):
+        self.b()
+    def b(self):
+        pass
+"""
+    assert format_code(source) == expected.strip('\n')
 
 def test_multiple_roots_sorted_by_out_degree():
-    source = (
-        "def root2():\n"
-        "    pass\n"
-        "def root1():\n"
-        "    child1()\n"
-        "    child2()\n"
-        "def child1():\n"
-        "    pass\n"
-        "def child2():\n"
-        "    pass\n"
-    )
+    source = """
+def root2():
+    pass
+def root1():
+    child1()
+    child2()
+def child1():
+    pass
+def child2():
+    pass
+"""
     # root1 calls 2 things, root2 calls 0 things.
     # root1 should precede root2.
-    expected = (
-        "def root1():\n"
-        "    child1()\n"
-        "    child2()\n"
-        "def child1():\n"
-        "    pass\n"
-        "def child2():\n"
-        "    pass\n"
-        "def root2():\n"
-        "    pass\n"
-    )
-    assert format_code(source) == expected
+    expected = """
+def root1():
+    child1()
+    child2()
+def child1():
+    pass
+def child2():
+    pass
+def root2():
+    pass
+"""
+    assert format_code(source) == expected.strip('\n')
 
 def test_retains_comments_and_decorators():
-    source = (
-        "@deco\n"
-        "def b():\n"
-        "    pass\n"
-        "# Comment for a\n"
-        "def a():\n"
-        "    b()\n"
-    )
-    expected = (
-        "# Comment for a\n"
-        "def a():\n"
-        "    b()\n"
-        "@deco\n"
-        "def b():\n"
-        "    pass\n"
-    )
-    assert format_code(source) == expected
+    source = """
+@deco
+def b():
+    pass
+# Comment for a
+def a():
+    b()
+"""
+    expected = """
+# Comment for a
+def a():
+    b()
+@deco
+def b():
+    pass
+"""
+    assert format_code(source) == expected.strip('\n')
 
 def test_cls_calls():
-    source = (
-        "class A:\n"
-        "    @classmethod\n"
-        "    def b(cls):\n"
-        "        pass\n"
-        "    @classmethod\n"
-        "    def a(cls):\n"
-        "        cls.b()\n"
-    )
-    expected = (
-        "class A:\n"
-        "    @classmethod\n"
-        "    def a(cls):\n"
-        "        cls.b()\n"
-        "    @classmethod\n"
-        "    def b(cls):\n"
-        "        pass\n"
-    )
-    assert format_code(source) == expected
+    source = """
+class A:
+    @classmethod
+    def b(cls):
+        pass
+    @classmethod
+    def a(cls):
+        cls.b()
+"""
+    expected = """
+class A:
+    @classmethod
+    def a(cls):
+        cls.b()
+    @classmethod
+    def b(cls):
+        pass
+"""
+    assert format_code(source) == expected.strip('\n')
+
+def test_mixed_approach_method_calls_module_function():
+    # A class method calls a module-level function.
+    # The stepdown analyzer recursively evaluates the class body and 
+    # adds module_func to the calls for class A, effectively ranking A above it.
+    source = """
+def module_func():
+    pass
+class A:
+    def method(self):
+        module_func()
+"""
+    expected = """
+class A:
+    def method(self):
+        module_func()
+def module_func():
+    pass
+"""
+    assert format_code(source) == expected.strip('\n')
+
+def test_class_type_dependencies():
+    source = """
+class B:
+     pass
+class A:
+     b: B
+"""
+    expected = """
+class A:
+     b: B
+class B:
+     pass
+"""
+    assert format_code(source) == expected.strip('\n')
+
+def test_real_world_cli_script():
+    source = """
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    id: int
+    name: str
+
+class UserService:
+    def fetch_user(self, uid: int) -> User:
+        return User(id=uid, name="Alice")
+
+def main():
+    service = UserService()
+    user = service.fetch_user(1)
+    print(user)
+
+if __name__ == "__main__":
+    main()
+"""
+    expected = """
+from dataclasses import dataclass
+
+def main():
+    service = UserService()
+    user = service.fetch_user(1)
+    print(user)
+
+class UserService:
+    def fetch_user(self, uid: int) -> User:
+        return User(id=uid, name="Alice")
+
+@dataclass
+class User:
+    id: int
+    name: str
+
+if __name__ == "__main__":
+    main()
+"""
+    assert format_code(source) == expected.strip('\n')
+
+def test_real_world_api_router():
+    source = """
+class ItemRequest:
+    name: str
+
+def _validate_name(name: str) -> bool:
+    return len(name) > 0
+
+class ItemController:
+    def handle(self, req: ItemRequest):
+        if not _validate_name(req.name):
+            raise ValueError()
+
+def post_item():
+    ctrl = ItemController()
+    ctrl.handle(ItemRequest(name="test"))
+"""
+    expected = """
+def post_item():
+    ctrl = ItemController()
+    ctrl.handle(ItemRequest(name="test"))
+
+class ItemController:
+    def handle(self, req: ItemRequest):
+        if not _validate_name(req.name):
+            raise ValueError()
+class ItemRequest:
+    name: str
+
+def _validate_name(name: str) -> bool:
+    return len(name) > 0
+"""
+    assert format_code(source) == expected.strip('\n')
+
+def test_real_world_repository_pattern():
+    source = """
+@dataclass
+class Config:
+    db_url: str
+
+class Database:
+    def __init__(self, cfg: Config):
+        self.url = cfg.db_url
+
+class UserRepository:
+    def __init__(self, db: Database):
+        self.db = db
+    
+    def get(self) -> User:
+        return User()
+
+class User:
+    pass
+
+class Application:
+    def __init__(self):
+        self.cfg = Config("sqlite://")
+        self.db = Database(self.cfg)
+        self.repo = UserRepository(self.db)
+        
+    def run(self):
+        self.repo.get()
+"""
+    # Kahn's algorithm resolves:
+    # App -> Config, Database, UserRepository
+    # Database -> Config
+    # UserRepository -> Database, User
+    # Valid output ensures A comes before B if A -> B
+    expected = """
+class Application:
+    def __init__(self):
+        self.cfg = Config("sqlite://")
+        self.db = Database(self.cfg)
+        self.repo = UserRepository(self.db)
+        
+    def run(self):
+        self.repo.get()
+
+class UserRepository:
+    def __init__(self, db: Database):
+        self.db = db
+    
+    def get(self) -> User:
+        return User()
+
+class Database:
+    def __init__(self, cfg: Config):
+        self.url = cfg.db_url
+@dataclass
+class Config:
+    db_url: str
+
+class User:
+    pass
+"""
+    assert format_code(source) == expected.strip('\n')
