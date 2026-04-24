@@ -1,13 +1,15 @@
 import ast
-import pytest
+
 from pystepdowner.analyzer import process_body
 
+
 def format_code(source: str) -> str:
-    source = source.strip('\n')
-    lines = source.split('\n')
+    source = source.strip("\n")
+    lines = source.split("\n")
     tree = ast.parse(source)
-    new_lines, modified = process_body(tree.body, lines)
-    return '\n'.join(new_lines).strip('\n')
+    new_lines, _ = process_body(tree.body, lines)
+    return "\n".join(new_lines).strip("\n")
+
 
 def test_valid_order():
     source = """
@@ -16,7 +18,8 @@ def a():
 def b():
     pass
 """
-    assert format_code(source) == source.strip('\n')
+    assert format_code(source) == source.strip("\n")
+
 
 def test_invalid_order_is_corrected():
     source = """
@@ -31,7 +34,8 @@ def a():
 def b():
     pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_init_always_first():
     source = """
@@ -48,7 +52,8 @@ class A:
     def b(self):
         pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_multiple_roots_sorted_by_out_degree():
     source = """
@@ -75,7 +80,8 @@ def child2():
 def root2():
     pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_retains_comments_and_decorators():
     source = """
@@ -94,7 +100,8 @@ def a():
 def b():
     pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_cls_calls():
     source = """
@@ -115,11 +122,12 @@ class A:
     def b(cls):
         pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_mixed_approach_method_calls_module_function():
     # A class method calls a module-level function.
-    # The stepdown analyzer recursively evaluates the class body and 
+    # The stepdown analyzer recursively evaluates the class body and
     # adds module_func to the calls for class A, effectively ranking A above it.
     source = """
 def module_func():
@@ -135,7 +143,8 @@ class A:
 def module_func():
     pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_class_type_dependencies():
     source = """
@@ -150,7 +159,8 @@ class A:
 class B:
      pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_real_world_cli_script():
     source = """
@@ -193,7 +203,8 @@ class User:
 if __name__ == "__main__":
     main()
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_real_world_api_router():
     source = """
@@ -227,7 +238,8 @@ class ItemRequest:
 def _validate_name(name: str) -> bool:
     return len(name) > 0
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
+
 
 def test_real_world_repository_pattern():
     source = """
@@ -290,4 +302,4 @@ class Config:
 class User:
     pass
 """
-    assert format_code(source) == expected.strip('\n')
+    assert format_code(source) == expected.strip("\n")
