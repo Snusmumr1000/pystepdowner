@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pystepdowner"
+version = "0.1.0"
+description = "Enforce stepdown rule in Python files"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.24.2",
+]
+
+[project.scripts]
+pystepdowner = "pystepdowner.cli:app"
+
+[tool.taskipy.tasks]
+lint = "ruff check src"
+format = "ruff format src"
+test = "pytest tests"
+run = "pystepdowner"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.20.2",
+    "pytest>=9.0.3",
+    "ruff>=0.15.11",
+    "taskipy>=1.14.1",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 140
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "N", "S", "B", "A", "C4", "T20", "RET", "SIM", "ARG", "PTH", "RUF"]
+
+[tool.mypy]
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
