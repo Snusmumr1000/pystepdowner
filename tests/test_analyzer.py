@@ -11,7 +11,7 @@ def format_code(source: str) -> str:
     return "\n".join(new_lines).strip("\n")
 
 
-def test_valid_order():
+def test_valid_order() -> None:
     source = """
 def a():
     b()
@@ -21,7 +21,7 @@ def b():
     assert format_code(source) == source.strip("\n")
 
 
-def test_invalid_order_is_corrected():
+def test_invalid_order_is_corrected() -> None:
     source = """
 def b():
     pass
@@ -37,7 +37,7 @@ def b():
     assert format_code(source) == expected.strip("\n")
 
 
-def test_init_always_first():
+def test_init_always_first() -> None:
     source = """
 class A:
     def b(self):
@@ -55,7 +55,7 @@ class A:
     assert format_code(source) == expected.strip("\n")
 
 
-def test_multiple_roots_sorted_by_out_degree():
+def test_multiple_roots_sorted_by_out_degree() -> None:
     source = """
 def root2():
     pass
@@ -83,7 +83,7 @@ def root2():
     assert format_code(source) == expected.strip("\n")
 
 
-def test_retains_comments_and_decorators():
+def test_retains_comments_and_decorators() -> None:
     source = """
 @deco
 def b():
@@ -103,7 +103,7 @@ def b():
     assert format_code(source) == expected.strip("\n")
 
 
-def test_cls_calls():
+def test_cls_calls() -> None:
     source = """
 class A:
     @classmethod
@@ -125,7 +125,7 @@ class A:
     assert format_code(source) == expected.strip("\n")
 
 
-def test_mixed_approach_method_calls_module_function():
+def test_mixed_approach_method_calls_module_function() -> None:
     # A class method calls a module-level function.
     # The stepdown analyzer recursively evaluates the class body and
     # adds module_func to the calls for class A, effectively ranking A above it.
@@ -146,7 +146,7 @@ def module_func():
     assert format_code(source) == expected.strip("\n")
 
 
-def test_class_type_dependencies():
+def test_class_type_dependencies() -> None:
     source = """
 class B:
      pass
@@ -162,7 +162,7 @@ class B:
     assert format_code(source) == expected.strip("\n")
 
 
-def test_real_world_cli_script():
+def test_real_world_cli_script() -> None:
     source = """
 from dataclasses import dataclass
 
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     assert format_code(source) == expected.strip("\n")
 
 
-def test_real_world_api_router():
+def test_real_world_api_router() -> None:
     source = """
 class ItemRequest:
     name: str
@@ -241,7 +241,7 @@ def _validate_name(name: str) -> bool:
     assert format_code(source) == expected.strip("\n")
 
 
-def test_real_world_repository_pattern():
+def test_real_world_repository_pattern() -> None:
     source = """
 @dataclass
 class Config:
