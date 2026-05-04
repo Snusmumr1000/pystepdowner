@@ -191,18 +191,13 @@ def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None 
     return new_lines, modified
 
 
-def reformat_file(filepath: str) -> bool:
-    path = Path(filepath)
-    with path.open(encoding="utf-8") as f:
-        source = f.read()
-
-    lines = source.splitlines()
-    tree = ast.parse(source)
+def reformat_content(content: str) -> str:
+    tree = ast.parse(content)
+    lines = content.splitlines()
 
     new_lines, modified = process_body(tree.body, lines)
 
     if modified:
-        with path.open("w", encoding="utf-8") as f:
-            f.write("\n".join(new_lines) + "\n")
+        return "\n".join(new_lines) + "\n" if new_lines else ""
 
-    return modified
+    return content
