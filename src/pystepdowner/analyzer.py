@@ -1,6 +1,5 @@
 import ast
 import heapq
-from pathlib import Path
 
 from pystepdowner.models import NodeChunk
 
