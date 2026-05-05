@@ -33,6 +33,34 @@ def b():
     assert format_code(source) == expected.strip("\n")
 
 
+def test_invalid_order_is_corrected_for_double_or_more_uses() -> None:
+    source = """
+def b():
+    pass
+
+
+def c():
+    b()
+
+
+def a():
+    b()
+"""
+    expected = """
+def c():
+    b()
+
+
+def a():
+    b()
+
+
+def b():
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
 def test_init_always_first() -> None:
     source = """
 class A:
@@ -452,6 +480,115 @@ def process(a: MyClass):
 
 
 class MyClass:
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_mutual_recursion_does_not_defer_ordering() -> None:
+    # When two functions are mutually recursive (A calls B, B calls A),
+    # the cycle should not cause them to be deferred after leaf helpers.
+    # This reproduces a real bug where process_body ↔ _recurse_class_bodies
+    # formed a cycle and got pushed after _has_future_annotations.
+    source = """
+def top():
+    heavy()
+    light()
+
+
+def light():
+    pass
+
+
+def heavy():
+    helper()
+
+
+def helper():
+    heavy()
+"""
+    # heavy calls helper (and helper calls heavy back — mutual recursion).
+    # Stepdown: top → heavy → helper → light
+    expected = """
+def top():
+    heavy()
+    light()
+
+
+def heavy():
+    helper()
+
+
+def helper():
+    heavy()
+
+
+def light():
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_mutually_recursive_callee_not_deferred_by_big_sibling() -> None:
+    # When an orchestrator calls a mutually-recursive helper AND a larger
+    # helper, the recursive one should still appear in the stepdown order
+    # near its caller — not be deferred to the bottom because its cycle
+    # partner keeps its in-degree elevated.
+    # This reproduces the bug where process_body's call to _recurse_class_bodies
+    # (which calls process_body back) was placed at the bottom of analyzer.py.
+    source = """
+def orchestrator():
+    recursive_helper()
+    big_helper()
+
+
+def big_helper():
+    sub_a()
+    sub_b()
+
+
+def sub_a():
+    pass
+
+
+def sub_b():
+    pass
+
+
+def recursive_helper():
+    partner()
+
+
+def partner():
+    recursive_helper()
+"""
+    # DFS from orchestrator:
+    #   big_helper (broader subtree) → sub_a → sub_b
+    #   recursive_helper → partner (cycle back to recursive_helper, skip)
+    expected = """
+def orchestrator():
+    recursive_helper()
+    big_helper()
+
+
+def recursive_helper():
+    partner()
+
+
+def partner():
+    recursive_helper()
+
+
+def big_helper():
+    sub_a()
+    sub_b()
+
+
+def sub_a():
+    pass
+
+
+def sub_b():
     pass
 """
     assert format_code(source) == expected.strip("\n")
