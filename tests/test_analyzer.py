@@ -1,20 +1,17 @@
-import ast
+from pystepdowner.analyzer import reformat_content
 
-from pystepdowner.analyzer import process_body
 
 
 def format_code(source: str) -> str:
-    source = source.strip("\n")
-    lines = source.split("\n")
-    tree = ast.parse(source)
-    new_lines, _ = process_body(tree.body, lines)
-    return "\n".join(new_lines).strip("\n")
+    return reformat_content(source.strip("\n")).strip("\n")
 
 
 def test_valid_order() -> None:
     source = """
 def a():
     b()
+
+
 def b():
     pass
 """
@@ -25,12 +22,16 @@ def test_invalid_order_is_corrected() -> None:
     source = """
 def b():
     pass
+
+
 def a():
     b()
 """
     expected = """
 def a():
     b()
+
+
 def b():
     pass
 """
@@ -42,6 +43,7 @@ def test_init_always_first() -> None:
 class A:
     def b(self):
         pass
+
     def __init__(self):
         self.b()
 """
@@ -49,6 +51,7 @@ class A:
 class A:
     def __init__(self):
         self.b()
+
     def b(self):
         pass
 """
@@ -59,11 +62,17 @@ def test_multiple_roots_sorted_by_out_degree() -> None:
     source = """
 def root2():
     pass
+
+
 def root1():
     child1()
     child2()
+
+
 def child1():
     pass
+
+
 def child2():
     pass
 """
@@ -73,10 +82,16 @@ def child2():
 def root1():
     child1()
     child2()
+
+
 def child1():
     pass
+
+
 def child2():
     pass
+
+
 def root2():
     pass
 """
@@ -88,6 +103,8 @@ def test_retains_comments_and_decorators() -> None:
 @deco
 def b():
     pass
+
+
 # Comment for a
 def a():
     b()
@@ -96,6 +113,8 @@ def a():
 # Comment for a
 def a():
     b()
+
+
 @deco
 def b():
     pass
@@ -109,6 +128,7 @@ class A:
     @classmethod
     def b(cls):
         pass
+
     @classmethod
     def a(cls):
         cls.b()
@@ -118,6 +138,7 @@ class A:
     @classmethod
     def a(cls):
         cls.b()
+
     @classmethod
     def b(cls):
         pass
@@ -132,6 +153,8 @@ def test_mixed_approach_method_calls_module_function() -> None:
     source = """
 def module_func():
     pass
+
+
 class A:
     def method(self):
         module_func()
@@ -140,6 +163,8 @@ class A:
 class A:
     def method(self):
         module_func()
+
+
 def module_func():
     pass
 """
@@ -150,12 +175,16 @@ def test_class_type_dependencies() -> None:
     source = """
 class B:
      pass
+
+
 class A:
      b: B
 """
     expected = """
 class A:
      b: B
+
+
 class B:
      pass
 """
@@ -166,19 +195,23 @@ def test_real_world_cli_script() -> None:
     source = """
 from dataclasses import dataclass
 
+
 @dataclass
 class User:
     id: int
     name: str
 
+
 class UserService:
     def fetch_user(self, uid: int) -> User:
         return User(id=uid, name="Alice")
+
 
 def main():
     service = UserService()
     user = service.fetch_user(1)
     print(user)
+
 
 if __name__ == "__main__":
     main()
@@ -186,19 +219,23 @@ if __name__ == "__main__":
     expected = """
 from dataclasses import dataclass
 
+
 def main():
     service = UserService()
     user = service.fetch_user(1)
     print(user)
 
+
 class UserService:
     def fetch_user(self, uid: int) -> User:
         return User(id=uid, name="Alice")
+
 
 @dataclass
 class User:
     id: int
     name: str
+
 
 if __name__ == "__main__":
     main()
@@ -211,13 +248,16 @@ def test_real_world_api_router() -> None:
 class ItemRequest:
     name: str
 
+
 def _validate_name(name: str) -> bool:
     return len(name) > 0
+
 
 class ItemController:
     def handle(self, req: ItemRequest):
         if not _validate_name(req.name):
             raise ValueError()
+
 
 def post_item():
     ctrl = ItemController()
@@ -228,12 +268,16 @@ def post_item():
     ctrl = ItemController()
     ctrl.handle(ItemRequest(name="test"))
 
+
 class ItemController:
     def handle(self, req: ItemRequest):
         if not _validate_name(req.name):
             raise ValueError()
+
+
 class ItemRequest:
     name: str
+
 
 def _validate_name(name: str) -> bool:
     return len(name) > 0
@@ -247,9 +291,11 @@ def test_real_world_repository_pattern() -> None:
 class Config:
     db_url: str
 
+
 class Database:
     def __init__(self, cfg: Config):
         self.url = cfg.db_url
+
 
 class UserRepository:
     def __init__(self, db: Database):
@@ -258,8 +304,10 @@ class UserRepository:
     def get(self) -> User:
         return User()
 
+
 class User:
     pass
+
 
 class Application:
     def __init__(self):
@@ -285,6 +333,7 @@ class Application:
     def run(self):
         self.repo.get()
 
+
 class UserRepository:
     def __init__(self, db: Database):
         self.db = db
@@ -292,12 +341,16 @@ class UserRepository:
     def get(self) -> User:
         return User()
 
+
 class Database:
     def __init__(self, cfg: Config):
         self.url = cfg.db_url
+
+
 @dataclass
 class Config:
     db_url: str
+
 
 class User:
     pass

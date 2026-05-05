@@ -18,7 +18,7 @@ def format_files(
     try:
         in_file_content = in_file.read_text(encoding="utf-8")
         reformatted_content = reformat_content(in_file_content)
-        typer.echo(reformatted_content, err=reformatted_content == in_file_content)
+        typer.echo(reformatted_content)
     except Exception as e:
         typer.echo(f"Error processing {in_file}: {e}", err=True)
 
