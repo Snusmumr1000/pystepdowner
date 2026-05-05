@@ -8,7 +8,24 @@ def reformat_content(content: str) -> str:
     tree = ast.parse(content)
     lines = content.splitlines()
 
-    new_lines, modified = process_body(tree.body, lines)
+    new_lines, modified, needs_future = process_body(tree.body, lines)
+
+    if needs_future:
+        has_future = any(line.strip() == "from __future__ import annotations" for line in new_lines)
+        if not has_future:
+            insert_idx = 0
+            if tree.body:
+                first_stmt = tree.body[0]
+                if (
+                    isinstance(first_stmt, ast.Expr)
+                    and isinstance(first_stmt.value, ast.Constant)
+                    and isinstance(first_stmt.value.value, str)
+                ):
+                    insert_idx = first_stmt.end_lineno
+            new_lines.insert(insert_idx, "from __future__ import annotations")
+            new_lines.insert(insert_idx + 1, "")
+            new_lines.insert(insert_idx + 2, "")
+            modified = True
 
     if modified:
         return "\n".join(new_lines) + "\n" if new_lines else ""
@@ -27,6 +44,30 @@ def get_calls(node: ast.AST, class_name: str | None) -> set[str]:
             and (child.value.id in ("self", "cls") or (class_name and child.value.id == class_name))
         ):
             calls.add(child.attr)
+    return calls
+
+
+def get_annotation_calls(node: ast.AST, class_name: str | None) -> set[str]:
+    annotation_nodes = []
+    for child in ast.walk(node):
+        if isinstance(child, ast.arg) and child.annotation:
+            annotation_nodes.append(child.annotation)
+        elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.returns:
+            annotation_nodes.append(child.returns)
+        elif isinstance(child, ast.AnnAssign) and child.annotation:
+            annotation_nodes.append(child.annotation)
+
+    calls = set()
+    for ann_node in annotation_nodes:
+        for child in ast.walk(ann_node):
+            if isinstance(child, ast.Name):
+                calls.add(child.id)
+            elif (
+                isinstance(child, ast.Attribute)
+                and isinstance(child.value, ast.Name)
+                and (child.value.id in ("self", "cls") or (class_name and child.value.id == class_name))
+            ):
+                calls.add(child.attr)
     return calls
 
 
@@ -67,7 +108,8 @@ def extract_chunks(
         is_init = node.name in ("__init__", "__post_init__")
 
         calls = get_calls(node, class_name)
-        chunks.append(NodeChunk(name=node.name, is_init=is_init, lines=chunk_lines, calls=calls))
+        annotation_calls = get_annotation_calls(node, class_name)
+        chunks.append(NodeChunk(name=node.name, is_init=is_init, lines=chunk_lines, calls=calls, annotation_calls=annotation_calls))
 
     return chunks, group_start_idx, group_end_idx
 
@@ -146,16 +188,19 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
     return inits + ordered
 
 
-def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None = None) -> tuple[list[str], bool]:
+def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None = None) -> tuple[list[str], bool, bool]:
     new_lines = lines[:]
     modified = False
+    needs_future = False
 
     for stmt in body:
         if isinstance(stmt, ast.ClassDef):
-            class_lines, class_mod = process_body(stmt.body, new_lines, class_name=stmt.name)
+            class_lines, class_mod, class_needs_future = process_body(stmt.body, new_lines, class_name=stmt.name)
             if class_mod:
                 new_lines = class_lines
                 modified = True
+            if class_needs_future:
+                needs_future = True
 
     groups = []
     current_group = []
@@ -191,6 +236,13 @@ def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None 
         original_order = [c.name for c in chunks]
         new_order = [c.name for c in reordered]
 
+        seen = set()
+        for c in reordered:
+            seen.add(c.name)
+            for ann_call in c.annotation_calls:
+                if ann_call in new_order and ann_call not in seen:
+                    needs_future = True
+
         if original_order != new_order:
             modified = True
             separator = ["", ""] if class_name is None else [""]
@@ -219,4 +271,4 @@ def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None 
 
             new_lines[start_idx : end_idx + 1] = reordered_lines
 
-    return new_lines, modified
+    return new_lines, modified, needs_future

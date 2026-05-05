@@ -176,6 +176,9 @@ class A:
      b: B
 """
     expected = """
+from __future__ import annotations
+
+
 class A:
      b: B
 
@@ -212,6 +215,9 @@ if __name__ == "__main__":
     main()
 """
     expected = """
+from __future__ import annotations
+
+
 from dataclasses import dataclass
 
 
@@ -259,6 +265,9 @@ def post_item():
     ctrl.handle(ItemRequest(name="test"))
 """
     expected = """
+from __future__ import annotations
+
+
 def post_item():
     ctrl = ItemController()
     ctrl.handle(ItemRequest(name="test"))
@@ -319,6 +328,9 @@ class Application:
     # UserRepository -> Database, User
     # Valid output ensures A comes before B if A -> B
     expected = """
+from __future__ import annotations
+
+
 class Application:
     def __init__(self):
         self.cfg = Config("sqlite://")
@@ -355,3 +367,53 @@ class User:
 
 def format_code(source: str) -> str:
     return reformat_content(source.strip("\n")).strip("\n")
+
+
+def test_future_annotations_inserted() -> None:
+    source = """
+def process(a: MyClass):
+    pass
+
+
+class MyClass:
+    pass
+"""
+    expected = """
+from __future__ import annotations
+
+
+def process(a: MyClass):
+    pass
+
+
+class MyClass:
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_future_annotations_idempotent() -> None:
+    source = """
+from __future__ import annotations
+
+
+def process(a: MyClass):
+    pass
+
+
+class MyClass:
+    pass
+"""
+    # Should not duplicate the import
+    expected = """
+from __future__ import annotations
+
+
+def process(a: MyClass):
+    pass
+
+
+class MyClass:
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
