@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pystepdowner"
-version = "0.1.0"
+version = "0.2.7"
 description = "Enforce stepdown rule in Python files"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -13,11 +13,11 @@ dependencies = [
 ]
 
 [project.scripts]
-pystepdowner = "pystepdowner.cli:app"
+pystepdowner = "pystepdowner.cli.cli:app"
 
 [tool.taskipy.tasks]
 lint = "ruff check . --fix && mypy . --fix"
-format = "ruff format . && ruff check --fix --select I ."
+format = "pystepdowner rewrite -i src && ruff format . && ruff check --fix --select I ."
 test = "pytest tests"
 run = "pystepdowner"
 
