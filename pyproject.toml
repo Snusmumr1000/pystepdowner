@@ -16,7 +16,7 @@ dependencies = [
 pystepdowner = "pystepdowner.cli:app"
 
 [tool.taskipy.tasks]
-lint = "ruff check . && mypy ."
+lint = "ruff check . --fix && mypy . --fix"
 format = "ruff format . && ruff check --fix --select I ."
 test = "pytest tests"
 run = "pystepdowner"
@@ -32,6 +32,7 @@ dev = [
 [tool.ruff]
 target-version = "py312"
 line-length = 140
+extend-exclude = ["tests/cases/"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "N", "S", "B", "A", "C4", "T20", "RET", "SIM", "ARG", "PTH", "RUF"]
@@ -39,6 +40,7 @@ ignore = []
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+"tests/cases/*" = ["A", "T201", "INP"]
 
 [tool.mypy]
 strict = true
@@ -46,3 +48,4 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+exclude = ["^tests/cases/"]

@@ -1,6 +1,5 @@
 import ast
 import heapq
-from pathlib import Path
 
 from pystepdowner.models import NodeChunk
 
@@ -182,27 +181,42 @@ def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None 
 
         if original_order != new_order:
             modified = True
-            reordered_lines = []
-            for c in reordered:
-                reordered_lines.extend(c.lines)
+            separator = ["", ""] if class_name is None else [""]
+
+            # Preserve the leading blank lines from the original first chunk
+            # (they represent spacing between preceding code and this group)
+            original_prefix: list[str] = []
+            first_chunk_lines = chunks[0].lines
+            for line in first_chunk_lines:
+                if line.strip():
+                    break
+                original_prefix.append(line)
+
+            reordered_lines: list[str] = list(original_prefix)
+            for i, c in enumerate(reordered):
+                # Strip leading blank lines from each chunk
+                content_start = 0
+                for j, line in enumerate(c.lines):
+                    if line.strip():
+                        content_start = j
+                        break
+                chunk_content = c.lines[content_start:]
+                if i > 0:
+                    reordered_lines.extend(separator)
+                reordered_lines.extend(chunk_content)
 
             new_lines[start_idx : end_idx + 1] = reordered_lines
 
     return new_lines, modified
 
 
-def reformat_file(filepath: str) -> bool:
-    path = Path(filepath)
-    with path.open(encoding="utf-8") as f:
-        source = f.read()
-
-    lines = source.splitlines()
-    tree = ast.parse(source)
+def reformat_content(content: str) -> str:
+    tree = ast.parse(content)
+    lines = content.splitlines()
 
     new_lines, modified = process_body(tree.body, lines)
 
     if modified:
-        with path.open("w", encoding="utf-8") as f:
-            f.write("\n".join(new_lines) + "\n")
+        return "\n".join(new_lines) + "\n" if new_lines else ""
 
-    return modified
+    return content
