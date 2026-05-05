@@ -4,6 +4,18 @@ import heapq
 from pystepdowner.models import NodeChunk
 
 
+def reformat_content(content: str) -> str:
+    tree = ast.parse(content)
+    lines = content.splitlines()
+
+    new_lines, modified = process_body(tree.body, lines)
+
+    if modified:
+        return "\n".join(new_lines) + "\n" if new_lines else ""
+
+    return content
+
+
 def get_calls(node: ast.AST, class_name: str | None) -> set[str]:
     calls = set()
     for child in ast.walk(node):
@@ -208,15 +220,3 @@ def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None 
             new_lines[start_idx : end_idx + 1] = reordered_lines
 
     return new_lines, modified
-
-
-def reformat_content(content: str) -> str:
-    tree = ast.parse(content)
-    lines = content.splitlines()
-
-    new_lines, modified = process_body(tree.body, lines)
-
-    if modified:
-        return "\n".join(new_lines) + "\n" if new_lines else ""
-
-    return content

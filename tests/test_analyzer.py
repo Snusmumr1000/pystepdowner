@@ -1,11 +1,6 @@
 from pystepdowner.analyzer import reformat_content
 
 
-
-def format_code(source: str) -> str:
-    return reformat_content(source.strip("\n")).strip("\n")
-
-
 def test_valid_order() -> None:
     source = """
 def a():
@@ -356,3 +351,7 @@ class User:
     pass
 """
     assert format_code(source) == expected.strip("\n")
+
+
+def format_code(source: str) -> str:
+    return reformat_content(source.strip("\n")).strip("\n")
