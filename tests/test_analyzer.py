@@ -61,6 +61,42 @@ def b():
     assert format_code(source) == expected.strip("\n")
 
 
+def test_invalid_order_is_corrected_for_nested_functions() -> None:
+    source = """
+def a():
+    def b():
+        def d():
+            pass
+
+        def e():
+            d()
+
+        e()
+
+    def c():
+        b()
+    
+    c()
+"""
+    expected = """
+def a():
+    def c():
+        b()
+
+    def b():
+        def e():
+            d()
+
+        def d():
+            pass
+
+        e()
+    
+    c()
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
 def test_init_always_first() -> None:
     source = """
 class A:

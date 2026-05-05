@@ -5,6 +5,11 @@ from pystepdowner.models import NodeChunk
 
 def reformat_content(content: str) -> str:
     tree = ast.parse(content)
+
+    for node in ast.walk(tree):
+        for child in ast.iter_child_nodes(node):
+            child.parent = node
+
     lines = content.splitlines()
 
     new_lines, modified, needs_future = process_body(tree.body, lines)
@@ -19,15 +24,15 @@ def reformat_content(content: str) -> str:
     return content
 
 
-def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None = None) -> tuple[list[str], bool, bool]:
+def process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bool, bool]:
     new_lines = lines[:]
     modified = False
     needs_future = False
 
-    # Recurse into class bodies
+    # Recurse into class and function bodies
     for stmt in body:
-        if isinstance(stmt, ast.ClassDef):
-            new_lines, m, f = process_body(stmt.body, new_lines, class_name=stmt.name)
+        if isinstance(stmt, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            new_lines, m, f = process_body(stmt.body, new_lines)
             modified |= m
             needs_future |= f
 
@@ -40,7 +45,7 @@ def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None 
             if hasattr(prev, "end_lineno") and prev.end_lineno is not None:
                 prev_node_end_line = prev.end_lineno
 
-        chunks, start_idx, end_idx = _extract_chunks(group, new_lines, prev_node_end_line, class_name)
+        chunks, start_idx, end_idx = _extract_chunks(group, new_lines, prev_node_end_line)
         reordered = reorder_chunks(chunks)
 
         original_order = [c.name for c in chunks]
@@ -55,7 +60,8 @@ def process_body(body: list[ast.stmt], lines: list[str], class_name: str | None 
 
         if original_order != new_order:
             modified = True
-            separator = ["", ""] if class_name is None else [""]
+            is_top_level = len(body) > 0 and isinstance(getattr(body[0], "parent", None), ast.Module)
+            separator = ["", ""] if is_top_level else [""]
 
             original_prefix: list[str] = []
             for line in chunks[0].lines:
@@ -102,7 +108,6 @@ def _extract_chunks(
     nodes: list[ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef],
     lines: list[str],
     prev_node_end_line: int,
-    class_name: str | None,
 ) -> tuple[list[NodeChunk], int, int]:
     chunks = []
     group_start_idx = -1
@@ -133,14 +138,15 @@ def _extract_chunks(
         chunk_lines = lines[start_idx : end_idx + 1]
         is_init = node.name in ("__init__", "__post_init__")
 
-        calls = _extract_calls(node, class_name, annotations_only=False)
-        annotation_calls = _extract_calls(node, class_name, annotations_only=True)
+        calls = _extract_calls(node, annotations_only=False)
+        annotation_calls = _extract_calls(node, annotations_only=True)
         chunks.append(NodeChunk(name=node.name, is_init=is_init, lines=chunk_lines, calls=calls, annotation_calls=annotation_calls))
 
     return chunks, group_start_idx, group_end_idx
 
 
-def _extract_calls(node: ast.AST, class_name: str | None, *, annotations_only: bool) -> list[str]:
+def _extract_calls(node: ast.AST, *, annotations_only: bool) -> list[str]:
+    class_name = _get_enclosing_class_name(node)
     if annotations_only:
         targets: list[ast.AST] = []
         for child in ast.walk(node):
@@ -176,6 +182,15 @@ def _extract_calls(node: ast.AST, class_name: str | None, *, annotations_only: b
     return result
 
 
+def _get_enclosing_class_name(node: ast.AST) -> str | None:
+    current = getattr(node, "parent", None)
+    while current:
+        if isinstance(current, ast.ClassDef):
+            return current.name
+        current = getattr(current, "parent", None)
+    return None
+
+
 def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
     chunk_map = {c.name: c for c in chunks}
 
@@ -198,18 +213,6 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
 
     ordered: list[NodeChunk] = []
     visited: set[str] = set()
-
-    def _is_reachable(src: str, dst: str, seen: set[str]) -> bool:
-        """Check if dst is reachable from src in the call graph (cycle detection)."""
-        if src == dst:
-            return True
-        if src in seen or src not in chunk_map:
-            return False
-        seen.add(src)
-        for call in chunk_map[src].calls:
-            if call in chunk_map and call != src and _is_reachable(call, dst, seen):
-                return True
-        return False
 
     def _dfs(node: NodeChunk) -> None:
         if node.name in visited:
@@ -238,6 +241,18 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
         )
         for callee in callees:
             _dfs(callee)
+
+    def _is_reachable(src: str, dst: str, seen: set[str]) -> bool:
+        """Check if dst is reachable from src in the call graph (cycle detection)."""
+        if src == dst:
+            return True
+        if src in seen or src not in chunk_map:
+            return False
+        seen.add(src)
+        for call in chunk_map[src].calls:
+            if call in chunk_map and call != src and _is_reachable(call, dst, seen):
+                return True
+        return False
 
     for root in roots:
         _dfs(root)

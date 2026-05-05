@@ -17,7 +17,7 @@ pystepdowner = "pystepdowner.cli.cli:app"
 
 [tool.taskipy.tasks]
 lint = "ruff check . --fix && mypy . --fix"
-format = "pystepdowner rewrite -i src && ruff format . && ruff check --fix --select I ."
+format = "pystepdowner rw -i src && ruff format . && ruff check --fix --select I ."
 test = "pytest tests"
 run = "pystepdowner"
 
