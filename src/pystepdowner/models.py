@@ -1,14 +1,4 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
-
-
-@dataclass
-class Scope:
-    """Represents a collection of NodeChunks in a specific scope (Module or Class)."""
-
-    name: str
-    chunks: list[NodeChunk]
 
 
 @dataclass
