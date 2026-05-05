@@ -392,6 +392,44 @@ class MyClass:
     assert format_code(source) == expected.strip("\n")
 
 
+def test_recursive_function_does_not_block_ordering() -> None:
+    # process_body calls itself recursively. The self-call must not inflate
+    # in_degree, otherwise process_body would never become a root and the
+    # entire subgraph (extract_chunks, get_calls, ...) would fall into the
+    # cycle-fallback path — producing wrong output order.
+    source = """
+def leaf():
+    pass
+
+
+def helper():
+    leaf()
+
+
+def recursive(items):
+    if items:
+        recursive(items[1:])
+    helper()
+"""
+    # recursive calls helper (and itself), helper calls leaf.
+    # correct stepdown order: recursive -> helper -> leaf
+    expected = """
+def recursive(items):
+    if items:
+        recursive(items[1:])
+    helper()
+
+
+def helper():
+    leaf()
+
+
+def leaf():
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
 def test_future_annotations_idempotent() -> None:
     source = """
 from __future__ import annotations
