@@ -97,7 +97,13 @@ def _extract_calls(node: ast.AST) -> tuple[list[str], list[str]]:
     cls = next((getattr(p, "name", None) for p in _walk_parents(node) if isinstance(p, ast.ClassDef)), None)
 
     def get_pos(n: ast.AST) -> tuple[int, int, str] | None:
-        if isinstance(n.parent, ast.Assign):
+        if isinstance(getattr(n, "ctx", None), (ast.Store, ast.Del)):
+            return None
+        if isinstance(getattr(n, "parent", None), ast.Assign):
+            in_func = any(isinstance(p, (ast.FunctionDef, ast.AsyncFunctionDef)) for p in _walk_parents(n))
+            if not in_func:
+                return None
+        if isinstance(getattr(n, "parent", None), ast.ClassDef) and n.parent.bases and n.parent.bases[0] == n:
             return None
         if isinstance(n, ast.Name):
             return n.lineno, n.col_offset, n.id

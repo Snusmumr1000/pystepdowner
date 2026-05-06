@@ -117,7 +117,7 @@ class A:
     assert format_code(source) == expected.strip("\n")
 
 
-def test_function_assignments() -> None:
+def test_function_assignments_static() -> None:
     source = """
 def meh() -> None:
     pass
@@ -130,6 +130,38 @@ class A:
 A.heh()
 """
     expected = source
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_function_assignments_dynamic() -> None:
+    source = """
+def cmd1() -> None:
+    pass
+
+
+def cmd2() -> None:
+    pass
+
+
+def main() -> None:
+    command1 = cmd1
+    command2 = cmd2
+    cmds = [command1, command2]
+"""
+    expected = """
+def main() -> None:
+    command1 = cmd1
+    command2 = cmd2
+    cmds = [command1, command2]
+
+
+def cmd1() -> None:
+    pass
+
+
+def cmd2() -> None:
+    pass
+"""
     assert format_code(source) == expected.strip("\n")
 
 
@@ -637,6 +669,26 @@ def sub_a():
 
 
 def sub_b():
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_inheritance_is_not_a_call_dependency() -> None:
+    source = """
+class Base:
+    pass
+
+
+class Child(Base):
+    pass
+"""
+    expected = """
+class Base:
+    pass
+
+
+class Child(Base):
     pass
 """
     assert format_code(source) == expected.strip("\n")
