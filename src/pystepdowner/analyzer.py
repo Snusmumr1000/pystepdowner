@@ -88,6 +88,14 @@ def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bo
                 if i > 0:
                     rebuilt.extend(sep)
                 rebuilt.extend(itertools.dropwhile(lambda line: not line.strip(), c.lines))
+
+            target_len = end_idx - start_idx + 1
+            if len(rebuilt) < target_len:
+                rebuilt.extend([""] * (target_len - len(rebuilt)))
+            elif len(rebuilt) > target_len:
+                while len(rebuilt) > target_len and not rebuilt[-1].strip():
+                    rebuilt.pop()
+
             new_lines[start_idx : end_idx + 1] = rebuilt
 
     return new_lines, modified, needs_future
@@ -103,7 +111,8 @@ def _extract_calls(node: ast.AST) -> tuple[list[str], list[str]]:
             in_func = any(isinstance(p, (ast.FunctionDef, ast.AsyncFunctionDef)) for p in _walk_parents(n))
             if not in_func:
                 return None
-        if isinstance(getattr(n, "parent", None), ast.ClassDef) and n.parent.bases and n.parent.bases[0] == n:
+        parent = getattr(n, "parent", None)
+        if isinstance(parent, ast.ClassDef) and parent.bases and parent.bases[0] == n:
             return None
         if isinstance(n, ast.Name):
             return n.lineno, n.col_offset, n.id
