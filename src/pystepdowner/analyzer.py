@@ -1,276 +1,167 @@
 import ast
+import itertools
+from collections.abc import Iterable, Iterator
+from typing import Any, cast
 
 from pystepdowner.models import NodeChunk
+
+_FUNC_OR_CLASS = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
 
 
 def reformat_content(content: str) -> str:
     tree = ast.parse(content)
-
     for node in ast.walk(tree):
         for child in ast.iter_child_nodes(node):
-            child.parent = node
+            cast(Any, child).parent = node
 
-    lines = content.splitlines()
-
-    new_lines, modified, needs_future = process_body(tree.body, lines)
+    new_lines, modified, needs_future = _process_body(tree.body, content.splitlines())
 
     if needs_future and not any(line.strip() == "from __future__ import annotations" for line in new_lines):
-        _prepend_future_annotations(tree, new_lines)
+        idx = (
+            (tree.body[0].end_lineno or 0)
+            if tree.body
+            and isinstance(tree.body[0], ast.Expr)
+            and isinstance(tree.body[0].value, ast.Constant)
+            and isinstance(tree.body[0].value.value, str)
+            else 0
+        )
+        new_lines[idx:idx] = ["from __future__ import annotations", "", ""]
         modified = True
 
-    if modified:
-        return "\n".join(new_lines) + "\n" if new_lines else ""
-
-    return content
+    return "\n".join(new_lines) + "\n" if modified and new_lines else content
 
 
-def process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bool, bool]:
-    new_lines = lines[:]
-    modified = False
-    needs_future = False
+def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bool, bool]:
+    new_lines, modified, needs_future = lines[:], False, False
 
-    # Recurse into class and function bodies
     for stmt in body:
-        if isinstance(stmt, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
-            new_lines, m, f = process_body(stmt.body, new_lines)
+        if isinstance(stmt, _FUNC_OR_CLASS):
+            new_lines, m, f = _process_body(stmt.body, new_lines)
             modified |= m
             needs_future |= f
 
-    # Collect and reorder function groups
-    for group in reversed(_collect_groups(body)):
-        idx = body.index(group[0])
-        prev_node_end_line = 0
-        if idx > 0:
-            prev = body[idx - 1]
-            if hasattr(prev, "end_lineno") and prev.end_lineno is not None:
-                prev_node_end_line = prev.end_lineno
+    groups = []
+    for is_func, grp in itertools.groupby(body, lambda s: isinstance(s, _FUNC_OR_CLASS)):
+        curr = list(grp)
+        if is_func and len(curr) > 1:
+            idx = body.index(curr[0])
+            limit = (getattr(body[idx - 1], "end_lineno", 0) or 0) if idx > 0 else 0
+            chunks, starts = [], []
+            for node in curr:
+                d = getattr(node, "decorator_list", [])
+                s, e = (min(x.lineno for x in d) if d else node.lineno) - 1, (node.end_lineno or node.lineno) - 1
+                while s > limit and (not (line := new_lines[s - 1].strip()) or line.startswith("#")):
+                    s -= 1
+                limit = e + 1
+                calls, ann = _extract_calls(node)
+                starts.append(s)
+                chunks.append(
+                    NodeChunk(
+                        name=cast(Any, node).name,
+                        is_init=cast(Any, node).name in ("__init__", "__post_init__"),
+                        lines=new_lines[s : e + 1],
+                        calls=calls,
+                        annotation_calls=ann,
+                    )
+                )
+            groups.append((chunks, starts[0], limit - 1))
 
-        chunks, start_idx, end_idx = _extract_chunks(group, new_lines, prev_node_end_line)
+    for chunks, start_idx, end_idx in reversed(groups):
         reordered = reorder_chunks(chunks)
+        orig, new = [c.name for c in chunks], [c.name for c in reordered]
 
-        original_order = [c.name for c in chunks]
-        new_order = [c.name for c in reordered]
-
-        seen: set[str] = set()
+        seen = set()
         for c in reordered:
             seen.add(c.name)
-            for ann_call in c.annotation_calls:
-                if ann_call in new_order and ann_call not in seen:
-                    needs_future = True
+            if any(a in new and a not in seen for a in c.annotation_calls):
+                needs_future = True
 
-        if original_order != new_order:
+        if orig != new:
             modified = True
-            is_top_level = len(body) > 0 and isinstance(getattr(body[0], "parent", None), ast.Module)
-            separator = ["", ""] if is_top_level else [""]
-
-            original_prefix: list[str] = []
-            for line in chunks[0].lines:
-                if line.strip():
-                    break
-                original_prefix.append(line)
-
-            reordered_lines: list[str] = list(original_prefix)
+            sep = ["", ""] if body and isinstance(getattr(body[0], "parent", None), ast.Module) else [""]
+            prefix = list(itertools.takewhile(lambda line: not line.strip(), chunks[0].lines))
+            rebuilt = list(prefix)
             for i, c in enumerate(reordered):
-                content_start = 0
-                for j, line in enumerate(c.lines):
-                    if line.strip():
-                        content_start = j
-                        break
-                chunk_content = c.lines[content_start:]
                 if i > 0:
-                    reordered_lines.extend(separator)
-                reordered_lines.extend(chunk_content)
-
-            new_lines[start_idx : end_idx + 1] = reordered_lines
+                    rebuilt.extend(sep)
+                rebuilt.extend(itertools.dropwhile(lambda line: not line.strip(), c.lines))
+            new_lines[start_idx : end_idx + 1] = rebuilt
 
     return new_lines, modified, needs_future
 
 
-def _collect_groups(body: list[ast.stmt]) -> list[list[ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef]]:
-    groups: list[list[ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef]] = []
-    current: list[ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef] = []
+def _extract_calls(node: ast.AST) -> tuple[list[str], list[str]]:
+    cls = next((getattr(p, "name", None) for p in _walk_parents(node) if isinstance(p, ast.ClassDef)), None)
 
-    for stmt in body:
-        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            current.append(stmt)
-        else:
-            if len(current) > 1:
-                groups.append(current)
-            current = []
+    def get_pos(n: ast.AST) -> tuple[int, int, str] | None:
+        if isinstance(n, ast.Name):
+            return n.lineno, n.col_offset, n.id
+        if isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id in ("self", "cls", cls):
+            return n.lineno, n.col_offset, n.attr
+        return None
 
-    if len(current) > 1:
-        groups.append(current)
+    all_pos: list[tuple[int, int, str]] = []
+    ann_pos: list[tuple[int, int, str]] = []
+    for child in ast.walk(node):
+        if pos := get_pos(child):
+            all_pos.append(pos)
+        targets = []
+        if isinstance(child, ast.arg) and child.annotation:
+            targets.append(child.annotation)
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.returns:
+            targets.append(child.returns)
+        if isinstance(child, ast.AnnAssign) and child.annotation:
+            targets.append(child.annotation)
+        for t in targets:
+            for n in ast.walk(t):
+                if pos_ann := get_pos(n):
+                    ann_pos.append(pos_ann)
 
-    return groups
+    def dedup(items: Iterable[tuple[int, int, str]]) -> list[str]:
+        return list(dict.fromkeys(name for _, _, name in sorted(items)))
 
-
-def _extract_chunks(
-    nodes: list[ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef],
-    lines: list[str],
-    prev_node_end_line: int,
-) -> tuple[list[NodeChunk], int, int]:
-    chunks = []
-    group_start_idx = -1
-    group_end_idx = -1
-
-    for i, node in enumerate(nodes):
-        start_lineno = node.lineno
-        if getattr(node, "decorator_list", []):
-            start_lineno = min(d.lineno for d in node.decorator_list)
-        end_lineno = node.end_lineno or start_lineno
-
-        start_idx = start_lineno - 1
-        end_idx = end_lineno - 1
-
-        limit = prev_node_end_line if i == 0 else (nodes[i - 1].end_lineno or 0)
-
-        while start_idx > limit:
-            line = lines[start_idx - 1].strip()
-            if line == "" or line.startswith("#"):
-                start_idx -= 1
-            else:
-                break
-
-        if i == 0:
-            group_start_idx = start_idx
-        group_end_idx = end_idx
-
-        chunk_lines = lines[start_idx : end_idx + 1]
-        is_init = node.name in ("__init__", "__post_init__")
-
-        calls = _extract_calls(node, annotations_only=False)
-        annotation_calls = _extract_calls(node, annotations_only=True)
-        chunks.append(NodeChunk(name=node.name, is_init=is_init, lines=chunk_lines, calls=calls, annotation_calls=annotation_calls))
-
-    return chunks, group_start_idx, group_end_idx
+    return dedup(all_pos), dedup(ann_pos)
 
 
-def _extract_calls(node: ast.AST, *, annotations_only: bool) -> list[str]:
-    class_name = _get_enclosing_class_name(node)
-    if annotations_only:
-        targets: list[ast.AST] = []
-        for child in ast.walk(node):
-            if isinstance(child, ast.arg) and child.annotation:
-                targets.append(child.annotation)
-            elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.returns:
-                targets.append(child.returns)
-            elif isinstance(child, ast.AnnAssign) and child.annotation:
-                targets.append(child.annotation)
-    else:
-        targets = [node]
-
-    calls_with_pos: list[tuple[int, int, str]] = []
-    for target in targets:
-        for child in ast.walk(target):
-            if isinstance(child, ast.Name):
-                calls_with_pos.append((getattr(child, "lineno", 0), getattr(child, "col_offset", 0), child.id))
-            elif (
-                isinstance(child, ast.Attribute)
-                and isinstance(child.value, ast.Name)
-                and (child.value.id in ("self", "cls") or (class_name is not None and child.value.id == class_name))
-            ):
-                calls_with_pos.append((getattr(child, "lineno", 0), getattr(child, "col_offset", 0), child.attr))
-
-    calls_with_pos.sort()
-
-    seen: set[str] = set()
-    result: list[str] = []
-    for _, _, name in calls_with_pos:
-        if name not in seen:
-            seen.add(name)
-            result.append(name)
-    return result
-
-
-def _get_enclosing_class_name(node: ast.AST) -> str | None:
-    current = getattr(node, "parent", None)
-    while current:
-        if isinstance(current, ast.ClassDef):
-            return current.name
-        current = getattr(current, "parent", None)
-    return None
+def _walk_parents(node: ast.AST) -> Iterator[ast.AST]:
+    cur = getattr(node, "parent", None)
+    while cur:
+        yield cur
+        cur = getattr(cur, "parent", None)
 
 
 def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
-    chunk_map = {c.name: c for c in chunks}
-
-    inits = [c for c in chunks if c.is_init]
+    cmap = {c.name: c for c in chunks}
+    inits = sorted((c for c in chunks if c.is_init), key=lambda c: c.name != "__init__")
     others = [c for c in chunks if not c.is_init]
 
-    inits.sort(key=lambda c: 0 if c.name == "__init__" else 1)
+    reach = {c.name: {x for x in c.calls if x in cmap and x != c.name} for c in others}
+    for k in reach:
+        for i in reach:
+            if k in reach[i]:
+                reach[i].update(reach[k])
 
-    # In-degrees for root detection (self-calls excluded).
-    in_deg: dict[str, int] = {c.name: 0 for c in others}
-    for c in others:
-        for call in c.calls:
-            if call in in_deg and call != c.name:
-                in_deg[call] += 1
-
+    indeg = {c.name: sum(1 for o in others if c.name in o.calls and o.name != c.name) for c in others}
     roots = sorted(
-        [c for c in others if in_deg[c.name] == 0],
-        key=lambda c: (-sum(1 for x in c.calls if x in chunk_map and x != c.name), chunks.index(c)),
+        [c for c in others if not indeg[c.name]], key=lambda c: (-sum(1 for x in c.calls if x in cmap and x != c.name), chunks.index(c))
     )
 
-    ordered: list[NodeChunk] = []
-    visited: set[str] = set()
+    ordered, visited = [], set()
 
     def _dfs(node: NodeChunk) -> None:
         if node.name in visited:
             return
-
-        # Defer if an unvisited non-cyclic caller exists.
-        for c in others:
-            if c.name == node.name or c.name in visited:
-                continue
-            if node.name not in c.calls:
-                continue
-            # c calls node and is unvisited — defer unless it's a cycle
-            if not _is_reachable(node.name, c.name, set()):
-                return
-
+        if any(c.name != node.name and c.name not in visited and node.name in c.calls and c.name not in reach[node.name] for c in others):
+            return
         visited.add(node.name)
         ordered.append(node)
-
-        callees = [chunk_map[x] for x in node.calls if x in chunk_map and x != node.name and x not in visited]
-        callee_names = {c.name for c in callees}
-        callees.sort(
-            key=lambda c: (
-                sum(1 for other in callee_names - {c.name} if _is_reachable(other, c.name, set())),
-                node.calls.index(c.name),
-            )
-        )
+        callees = [cmap[x] for x in node.calls if x in cmap and x != node.name and x not in visited]
+        callees.sort(key=lambda c: (sum(1 for o in callees if c.name in reach[o.name]), node.calls.index(c.name)))
         for callee in callees:
             _dfs(callee)
 
-    def _is_reachable(src: str, dst: str, seen: set[str]) -> bool:
-        """Check if dst is reachable from src in the call graph (cycle detection)."""
-        if src == dst:
-            return True
-        if src in seen or src not in chunk_map:
-            return False
-        seen.add(src)
-        for call in chunk_map[src].calls:
-            if call in chunk_map and call != src and _is_reachable(call, dst, seen):
-                return True
-        return False
-
-    for root in roots:
-        _dfs(root)
-
-    # Append any chunks not reached (isolated nodes or unresolved cycles).
+    for r in roots:
+        _dfs(r)
     for c in others:
-        if c.name not in visited:
-            _dfs(c)
-
+        _dfs(c)
     return inits + ordered
-
-
-def _prepend_future_annotations(tree: ast.Module, lines: list[str]) -> None:
-    insert_idx = 0
-    if tree.body:
-        first_stmt = tree.body[0]
-        if isinstance(first_stmt, ast.Expr) and isinstance(first_stmt.value, ast.Constant) and isinstance(first_stmt.value.value, str):
-            insert_idx = first_stmt.end_lineno or 0
-    lines.insert(insert_idx, "from __future__ import annotations")
-    lines.insert(insert_idx + 1, "")
-    lines.insert(insert_idx + 2, "")
