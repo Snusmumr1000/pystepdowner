@@ -27,11 +27,11 @@ def b():
 
 def test_given_out_of_order_dependencies_requiring_annotations_when_reformatting_then_future_annotations_is_added() -> None:
     source = """
-def process(a: MyClass):
+class MyClass:
     pass
 
 
-class MyClass:
+def process(a: MyClass):
     pass
 """
     expected = """
