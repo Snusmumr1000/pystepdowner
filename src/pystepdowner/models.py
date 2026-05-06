@@ -1,14 +1,4 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
-
-
-@dataclass
-class Scope:
-    """Represents a collection of NodeChunks in a specific scope (Module or Class)."""
-
-    name: str
-    chunks: list[NodeChunk]
 
 
 @dataclass
@@ -18,5 +8,5 @@ class NodeChunk:
     name: str
     is_init: bool
     lines: list[str]
-    calls: set[str]  # names of local functions/methods called by this chunk
-    annotation_calls: set[str]  # names of local functions/methods used in type hints
+    calls: list[str]  # names of local functions/methods called by this chunk
+    annotation_calls: list[str]  # names of local functions/methods used in type hints
