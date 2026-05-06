@@ -117,6 +117,22 @@ class A:
     assert format_code(source) == expected.strip("\n")
 
 
+def test_function_assignments() -> None:
+    source = """
+def meh() -> None:
+    pass
+
+
+class A:
+    heh = meh
+
+
+A.heh()
+"""
+    expected = source
+    assert format_code(source) == expected.strip("\n")
+
+
 def test_multiple_roots_sorted_by_out_degree() -> None:
     source = """
 def root2():
@@ -429,10 +445,6 @@ class User:
     assert format_code(source) == expected.strip("\n")
 
 
-def format_code(source: str) -> str:
-    return reformat_content(source.strip("\n")).strip("\n")
-
-
 def test_future_annotations_inserted() -> None:
     source = """
 def process(a: MyClass):
@@ -628,3 +640,7 @@ def sub_b():
     pass
 """
     assert format_code(source) == expected.strip("\n")
+
+
+def format_code(source: str) -> str:
+    return reformat_content(source.strip("\n")).strip("\n")

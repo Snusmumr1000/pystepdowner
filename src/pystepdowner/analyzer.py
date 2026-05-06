@@ -42,8 +42,11 @@ def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bo
 
     groups = []
     for is_func, grp in itertools.groupby(body, lambda s: isinstance(s, _FUNC_OR_CLASS)):
+        if not is_func:
+            continue
+
         curr = list(grp)
-        if is_func and len(curr) > 1:
+        if len(curr) > 1:
             idx = body.index(curr[0])
             limit = (getattr(body[idx - 1], "end_lineno", 0) or 0) if idx > 0 else 0
             chunks, starts = [], []
@@ -94,6 +97,8 @@ def _extract_calls(node: ast.AST) -> tuple[list[str], list[str]]:
     cls = next((getattr(p, "name", None) for p in _walk_parents(node) if isinstance(p, ast.ClassDef)), None)
 
     def get_pos(n: ast.AST) -> tuple[int, int, str] | None:
+        if isinstance(n.parent, ast.Assign):
+            return None
         if isinstance(n, ast.Name):
             return n.lineno, n.col_offset, n.id
         if isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id in ("self", "cls", cls):

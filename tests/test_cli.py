@@ -58,24 +58,6 @@ class A:
 """
 
 
-@dataclass
-class FileFixture:
-    file_path: str
-    content: str
-    expected_content: str
-
-    def setup(self, base_dir: Path) -> Path:
-        full_path = base_dir / self.file_path
-        full_path.parent.mkdir(parents=True, exist_ok=True)
-        full_path.write_text(self.content.strip("\n"), encoding="utf-8")
-        return full_path
-
-    def verify(self, base_dir: Path) -> None:
-        full_path = base_dir / self.file_path
-        actual = full_path.read_text(encoding="utf-8").strip("\n")
-        assert actual == self.expected_content.strip("\n")
-
-
 def test_rw_single_file_in_place(tmp_path: Path) -> None:
     fixture = FileFixture("test_1.py", SOURCE_CODE_1, EXPECTED_CODE_1)
     in_file = fixture.setup(tmp_path)
@@ -115,3 +97,21 @@ def test_rw_directory_recursive(tmp_path: Path) -> None:
     assert result.exit_code == 0
     for fixture in fixtures:
         fixture.verify(tmp_path)
+
+
+@dataclass
+class FileFixture:
+    file_path: str
+    content: str
+    expected_content: str
+
+    def setup(self, base_dir: Path) -> Path:
+        full_path = base_dir / self.file_path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+        full_path.write_text(self.content.strip("\n"), encoding="utf-8")
+        return full_path
+
+    def verify(self, base_dir: Path) -> None:
+        full_path = base_dir / self.file_path
+        actual = full_path.read_text(encoding="utf-8").strip("\n")
+        assert actual == self.expected_content.strip("\n")
