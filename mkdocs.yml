@@ -1,0 +1,4 @@
+site_name: pystepdowner
+nav:
+  - Main: index.md
+  - Cases: cases.md
