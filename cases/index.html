@@ -442,6 +442,7 @@
 
 def a() -&gt; str:
     return b()
+
 </code></pre>
 <p>After:</p>
 <pre><code class="language-python">def a() -&gt; str:
@@ -450,6 +451,7 @@ def a() -&gt; str:
 
 def b() -&gt; str:
     return &quot;b&quot;
+
 </code></pre>
 <h2 id="function-a-calls-b-then-c">Function A calls B then C</h2>
 <p><code>pystepdowner</code> keeps called functions below the caller in call order.</p>
@@ -464,6 +466,7 @@ def b() -&gt; str:
 
 def a() -&gt; str:
     return b() + c()
+
 </code></pre>
 <p>After:</p>
 <pre><code class="language-python">def a() -&gt; str:
@@ -476,6 +479,7 @@ def b() -&gt; str:
 
 def c() -&gt; str:
     return &quot;c&quot;
+
 </code></pre>
 
 
