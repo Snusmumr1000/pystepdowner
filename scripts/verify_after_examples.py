@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from dataclasses import dataclass
 from pathlib import Path
 from sys import stdout
@@ -33,11 +34,23 @@ def verify_after_examples(root: Path) -> VerificationResult:
 
 def verify_after_example(before_file: Path) -> list[str]:
     after_file = before_file.with_name("after.py")
-    expected = reformat_content(before_file.read_text(encoding="utf-8"))
+    failures = verify_python_syntax(before_file)
+    before_content = before_file.read_text(encoding="utf-8")
+    expected = reformat_content(before_content)
     if not after_file.exists():
-        return [f"{after_file}: missing"]
-    if after_file.read_text(encoding="utf-8") != expected:
-        return [f"{after_file}: does not match formatted {before_file}"]
+        return [*failures, f"{after_file}: missing"]
+    after_content = after_file.read_text(encoding="utf-8")
+    failures.extend(verify_python_syntax(after_file))
+    if after_content != expected:
+        failures.append(f"{after_file}: does not match formatted {before_file}")
+    return failures
+
+
+def verify_python_syntax(file_path: Path) -> list[str]:
+    try:
+        ast.parse(file_path.read_text(encoding="utf-8"), filename=str(file_path))
+    except SyntaxError as exc:
+        return [f"{file_path}: invalid Python syntax: {exc.msg} at line {exc.lineno}"]
     return []
 
 
