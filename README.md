@@ -57,128 +57,36 @@ pystepdowner rw -i src/
 
 ## Example
 
-`pystepdowner` transforms bottom-up code (where helpers are defined before they are used) into top-down code (where the highest-level, most important logic comes first).
+`pystepdowner` transforms bottom-up code into top-down code, putting high-level logic before the helpers it calls.
 
-**Before (Bottom-Up Architecture):**
+**Before:**
 ```python
-# --- Persistence Layer ---
-def _execute_query(query: str, params: dict) -> list[dict]:
-    return [{"id": 1, "name": "Alice", "role": "admin"}]
+def load_user(user_id: int) -> dict:
+    return {"id": user_id, "name": "Alice"}
 
-def fetch_user_record(user_id: int) -> dict:
-    return _execute_query("SELECT * FROM users WHERE id = :id", {"id": user_id})
 
-def fetch_user_permissions(user_id: int) -> list[str]:
-    records = _execute_query("SELECT perm FROM user_perms WHERE user_id = :id", {"id": user_id})
-    return [r["perm"] for r in records]
+def format_user(user: dict) -> str:
+    return f"{user['id']}: {user['name']}"
 
-# --- Mapping Layer ---
-def map_role(role_str: str) -> str:
-    return role_str.upper()
-
-def map_permissions(perms: list[str]) -> list[str]:
-    return [p.strip() for p in perms]
-
-def build_user_model(record: dict) -> dict:
-    return {"id": record["id"], "name": record["name"], "role": map_role(record["role"])}
-
-def build_user_context(user_model: dict, perms: list[str]) -> dict:
-    return {"user": user_model, "permissions": map_permissions(perms)}
-
-def map_to_domain(record: dict, perms: list[str]) -> dict:
-    user_model = build_user_model(record)
-    return build_user_context(user_model, perms)
-
-# --- Service Layer ---
-def validate_user_access(domain_user: dict) -> bool:
-    return domain_user["user"]["role"] == "ADMIN"
-
-def enrich_user_data(domain_user: dict) -> dict:
-    domain_user["status"] = "active"
-    return domain_user
-
-def get_user_profile(user_id: int) -> dict:
-    record = fetch_user_record(user_id)
-    perms = fetch_user_permissions(user_id)
-    domain_user = map_to_domain(record, perms)
-    if not validate_user_access(domain_user):
-        raise ValueError("Access Denied")
-    return enrich_user_data(domain_user)
-
-# --- Controller Layer ---
-def format_response(profile: dict) -> dict:
-    return {"status": 200, "data": profile}
 
 def user_controller(user_id: int) -> dict:
-    profile = get_user_profile(user_id)
-    return format_response(profile)
+    user = load_user(user_id)
+    return {"body": format_user(user)}
 ```
 
 **After running `pystepdowner rw -i my_script.py`:**
 ```python
 def user_controller(user_id: int) -> dict:
-    profile = get_user_profile(user_id)
-    return format_response(profile)
+    user = load_user(user_id)
+    return {"body": format_user(user)}
 
 
-def get_user_profile(user_id: int) -> dict:
-    record = fetch_user_record(user_id)
-    perms = fetch_user_permissions(user_id)
-    domain_user = map_to_domain(record, perms)
-    if not validate_user_access(domain_user):
-        raise ValueError("Access Denied")
-    return enrich_user_data(domain_user)
+def load_user(user_id: int) -> dict:
+    return {"id": user_id, "name": "Alice"}
 
 
-def fetch_user_record(user_id: int) -> dict:
-    return _execute_query("SELECT * FROM users WHERE id = :id", {"id": user_id})
-
-
-def fetch_user_permissions(user_id: int) -> list[str]:
-    records = _execute_query("SELECT perm FROM user_perms WHERE user_id = :id", {"id": user_id})
-    return [r["perm"] for r in records]
-
-
-# --- Persistence Layer ---
-def _execute_query(query: str, params: dict) -> list[dict]:
-    return [{"id": 1, "name": "Alice", "role": "admin"}]
-
-
-def map_to_domain(record: dict, perms: list[str]) -> dict:
-    user_model = build_user_model(record)
-    return build_user_context(user_model, perms)
-
-
-def build_user_model(record: dict) -> dict:
-    return {"id": record["id"], "name": record["name"], "role": map_role(record["role"])}
-
-
-# --- Mapping Layer ---
-def map_role(role_str: str) -> str:
-    return role_str.upper()
-
-
-def build_user_context(user_model: dict, perms: list[str]) -> dict:
-    return {"user": user_model, "permissions": map_permissions(perms)}
-
-
-def map_permissions(perms: list[str]) -> list[str]:
-    return [p.strip() for p in perms]
-
-
-# --- Service Layer ---
-def validate_user_access(domain_user: dict) -> bool:
-    return domain_user["user"]["role"] == "ADMIN"
-
-
-def enrich_user_data(domain_user: dict) -> dict:
-    domain_user["status"] = "active"
-    return domain_user
-
-
-# --- Controller Layer ---
-def format_response(profile: dict) -> dict:
-    return {"status": 200, "data": profile}
+def format_user(user: dict) -> str:
+    return f"{user['id']}: {user['name']}"
 ```
 
 ## Features
