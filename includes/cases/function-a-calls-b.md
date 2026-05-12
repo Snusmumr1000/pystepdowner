@@ -5,21 +5,11 @@
 Before:
 
 ```python
-def b() -> str:
-    return "b"
-
-
-def a() -> str:
-    return b()
+--8<-- "docs_src/cases/function_a_calls_b/before.py"
 ```
 
 After:
 
 ```python
-def a() -> str:
-    return b()
-
-
-def b() -> str:
-    return "b"
+--8<-- "docs_src/cases/function_a_calls_b/after.py"
 ```
