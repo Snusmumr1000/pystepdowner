@@ -11,7 +11,7 @@ def b() -> str:
 
 
 def a(key: str):
-    # Direct call
+    # Lazy evaluation
     res = b()
     # Lazy evaluation
     mapping = {"c": c}
