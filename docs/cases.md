@@ -8,6 +8,10 @@ Case names follow the pattern: `{caller kind} caller -> {callee cardinality} {ca
 
 --8<-- "includes/cases/function-a-calls-b-then-c.md"
 
+--8<-- "includes/cases/function-uses-dictionary-to-call-b.md"
+
+--8<-- "includes/cases/function-uses-dictionary-to-call-b-and-c.md"
+
 ## Classes
 
 --8<-- "includes/cases/class-method-calls-one-method.md"
