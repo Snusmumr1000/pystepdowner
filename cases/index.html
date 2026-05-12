@@ -350,21 +350,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#function-subject-one-or-more-function-references-via-direct-calls" class="md-nav__link">
+  <a href="#function-subject-one-or-more-function-references" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Function subject -&gt; one or more function references via direct calls
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#function-subject-function-references-via-lazy-evaluation-list-or-dictionary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Function subject -&gt; function references via lazy evaluation (list or dictionary)
+        Function subject -&gt; one or more function references
       
     </span>
   </a>
@@ -517,21 +506,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#function-subject-one-or-more-function-references-via-direct-calls" class="md-nav__link">
+  <a href="#function-subject-one-or-more-function-references" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Function subject -&gt; one or more function references via direct calls
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#function-subject-function-references-via-lazy-evaluation-list-or-dictionary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Function subject -&gt; function references via lazy evaluation (list or dictionary)
+        Function subject -&gt; one or more function references
       
     </span>
   </a>
@@ -657,36 +635,14 @@
 <h1 id="cases">Cases</h1>
 <p>Case names follow the pattern: <code>{subject kind} subject -&gt; {reference cardinality} {target kind} reference(s) via {reference form}</code>.</p>
 <h2 id="functions">Functions</h2>
-<h3 id="function-subject-one-or-more-function-references-via-direct-calls">Function subject -&gt; one or more function references via direct calls</h3>
-<p>Subject: one module-level function. References: one or more module-level functions. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.</p>
+<h3 id="function-subject-one-or-more-function-references">Function subject -&gt; one or more function references</h3>
+<p>Subject: one module-level function. References: one or more module-level functions. Reference form: direct calls or lazy evaluation. Expected order: subject first, then referenced declarations in their first appearance order.</p>
 <p>Before:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">b</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="p">()</span>
-</code></pre></div>
-<p>After:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">b</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="p">()</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">d</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;d&quot;</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
-</code></pre></div>
-<h3 id="function-subject-function-references-via-lazy-evaluation-list-or-dictionary">Function subject -&gt; function references via lazy evaluation (list or dictionary)</h3>
-<p>Subject: one module-level function. References: two module-level functions. Reference form: lazy evaluation (list or dictionary values). Expected order: subject first, then referenced declarations in their first appearance order.</p>
-<p>Before:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
 
 
@@ -695,19 +651,23 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="c1"># Dictionary lazy evaluation</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">}</span>
-    <span class="c1"># List lazy evaluation</span>
-    <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">](),</span> <span class="n">l</span>
+    <span class="c1"># Direct call</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">b</span><span class="p">()</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">}</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">mapping</span><span class="p">[</span><span class="n">key</span><span class="p">](),</span> <span class="n">sequence</span>
 </code></pre></div>
 <p>After:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="c1"># Dictionary lazy evaluation</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">}</span>
-    <span class="c1"># List lazy evaluation</span>
-    <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">](),</span> <span class="n">l</span>
+    <span class="c1"># Direct call</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">b</span><span class="p">()</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">}</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">mapping</span><span class="p">[</span><span class="n">key</span><span class="p">](),</span> <span class="n">sequence</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -716,6 +676,10 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">d</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;d&quot;</span>
 </code></pre></div>
 <h3 id="function-subject-self-reference-and-helper-reference-via-direct-calls">Function subject -&gt; self reference and helper reference via direct calls</h3>
 <p>Subject: one recursive module-level function. References: itself and one module-level helper function. Reference form: direct calls. Expected order: subject first, then referenced helper declarations in reference order.</p>

@@ -19,7 +19,7 @@
     
     
       
-        <title>Function a calls b then c - pystepdowner</title>
+        <title>Function references - pystepdowner</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#function-subject-one-or-more-function-references-via-direct-calls" class="md-skip">
+        <a href="#function-subject-one-or-more-function-references" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Function a calls b then c
+              Function references
             
           </span>
         </div>
@@ -319,10 +319,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#function-subject-one-or-more-function-references-via-direct-calls" class="md-nav__link">
+  <a href="#function-subject-one-or-more-function-references" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Function subject -&gt; one or more function references via direct calls
+        Function subject -&gt; one or more function references
       
     </span>
   </a>
@@ -346,12 +346,16 @@
 
 
 
-  <h1>Function a calls b then c</h1>
+  <h1>Function references</h1>
 
-<h3 id="function-subject-one-or-more-function-references-via-direct-calls">Function subject -&gt; one or more function references via direct calls</h3>
-<p>Subject: one module-level function. References: one or more module-level functions. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.</p>
+<h3 id="function-subject-one-or-more-function-references">Function subject -&gt; one or more function references</h3>
+<p>Subject: one module-level function. References: one or more module-level functions. Reference form: direct calls or lazy evaluation. Expected order: subject first, then referenced declarations in their first appearance order.</p>
 <p>Before:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">d</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;d&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
 
 
@@ -359,12 +363,24 @@
     <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">b</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># Direct call</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">b</span><span class="p">()</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">}</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">mapping</span><span class="p">[</span><span class="n">key</span><span class="p">](),</span> <span class="n">sequence</span>
 </code></pre></div>
 <p>After:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">b</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># Direct call</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">b</span><span class="p">()</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">}</span>
+    <span class="c1"># Lazy evaluation</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">mapping</span><span class="p">[</span><span class="n">key</span><span class="p">](),</span> <span class="n">sequence</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -373,6 +389,10 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">d</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;d&quot;</span>
 </code></pre></div>
 
 
