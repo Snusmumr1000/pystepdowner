@@ -5,11 +5,11 @@ Subject: one instance method. References: one instance method and one static met
 Before:
 
 ```python
---8<-- "docs_src/cases/class_method_calls_instance_and_static_methods/before.py"
+--8<-- "docs/docs_src/cases/class_method_calls_instance_and_static_methods/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/class_method_calls_instance_and_static_methods/after.py"
+--8<-- "docs/docs_src/cases/class_method_calls_instance_and_static_methods/after.py"
 ```

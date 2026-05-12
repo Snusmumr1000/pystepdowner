@@ -11,7 +11,7 @@ from pystepdowner.analyzer import reformat_content
 
 
 def main(
-    root: Annotated[Path, typer.Argument(help="Root directory to scan.")] = Path("docs_src"),
+    root: Annotated[Path, typer.Argument(help="Root directory to scan.")] = Path("docs/docs_src"),
 ) -> None:
     """Regenerate sibling after.py examples from before.py files."""
     result = update_after_examples(root)

@@ -5,11 +5,11 @@ Subject: one instance method. References: two instance methods. Reference form: 
 Before:
 
 ```python
---8<-- "docs_src/cases/class_method_calls_two_methods/before.py"
+--8<-- "docs/docs_src/cases/class_method_calls_two_methods/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/class_method_calls_two_methods/after.py"
+--8<-- "docs/docs_src/cases/class_method_calls_two_methods/after.py"
 ```

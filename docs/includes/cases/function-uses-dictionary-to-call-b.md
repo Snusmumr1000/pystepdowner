@@ -5,11 +5,11 @@ Subject: one module-level function. References: one module-level function. Refer
 Before:
 
 ```python
---8<-- "docs_src/cases/function_uses_dictionary_to_call_b/before.py"
+--8<-- "docs/docs_src/cases/function_uses_dictionary_to_call_b/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/function_uses_dictionary_to_call_b/after.py"
+--8<-- "docs/docs_src/cases/function_uses_dictionary_to_call_b/after.py"
 ```

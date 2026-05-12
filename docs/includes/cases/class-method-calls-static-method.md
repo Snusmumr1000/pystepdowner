@@ -5,11 +5,11 @@ Subject: one instance method. References: one static method. Reference form: dir
 Before:
 
 ```python
---8<-- "docs_src/cases/class_method_calls_static_method/before.py"
+--8<-- "docs/docs_src/cases/class_method_calls_static_method/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/class_method_calls_static_method/after.py"
+--8<-- "docs/docs_src/cases/class_method_calls_static_method/after.py"
 ```

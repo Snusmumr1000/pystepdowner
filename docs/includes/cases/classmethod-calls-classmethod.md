@@ -5,11 +5,11 @@ Subject: one class method. References: one class method. Reference form: direct 
 Before:
 
 ```python
---8<-- "docs_src/cases/classmethod_calls_classmethod/before.py"
+--8<-- "docs/docs_src/cases/classmethod_calls_classmethod/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/classmethod_calls_classmethod/after.py"
+--8<-- "docs/docs_src/cases/classmethod_calls_classmethod/after.py"
 ```
