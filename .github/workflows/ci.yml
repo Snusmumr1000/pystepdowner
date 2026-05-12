@@ -36,5 +36,8 @@ jobs:
       - name: Ensure lint did not rewrite files
         run: git diff --exit-code
 
+      - name: Verify after.py examples
+        run: uv run python scripts/verify_after_examples.py
+
       - name: Run tests
         run: uv run task test
