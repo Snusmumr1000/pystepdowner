@@ -1,4 +1,4 @@
-## Function A calls B
+### Function A calls B
 
 `pystepdowner` moves called functions below their caller.
 

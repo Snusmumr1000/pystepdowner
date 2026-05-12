@@ -1,4 +1,4 @@
-## Class method calls one method
+### Class method calls one method
 
 `pystepdowner` moves a called class method below its caller.
 

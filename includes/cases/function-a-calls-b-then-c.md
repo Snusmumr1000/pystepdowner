@@ -1,4 +1,4 @@
-## Function A calls B then C
+### Function A calls B then C
 
 `pystepdowner` keeps called functions below the caller in call order.
 

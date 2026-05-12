@@ -1,4 +1,4 @@
-## Class method calls static method
+### Class method calls static method
 
 `pystepdowner` moves a called static method below its caller.
 

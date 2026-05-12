@@ -1,4 +1,4 @@
-## Class method calls two methods
+### Class method calls two methods
 
 `pystepdowner` keeps called class methods below the caller in call order.
 

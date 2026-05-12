@@ -1,4 +1,4 @@
-## Class method calls instance and static methods
+### Class method calls instance and static methods
 
 `pystepdowner` keeps called instance and static methods below the caller in call order.
 
