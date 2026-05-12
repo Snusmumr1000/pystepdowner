@@ -4,11 +4,7 @@ Case names follow the pattern: `{subject kind} subject -> {reference cardinality
 
 ## Functions
 
---8<-- "docs/includes/cases/function-a-calls-b.md"
-
 --8<-- "docs/includes/cases/function-a-calls-b-then-c.md"
-
---8<-- "docs/includes/cases/function-uses-dictionary-to-call-b.md"
 
 --8<-- "docs/includes/cases/function-uses-dictionary-to-call-b-and-c.md"
 
@@ -21,8 +17,6 @@ Case names follow the pattern: `{subject kind} subject -> {reference cardinality
 --8<-- "docs/includes/cases/function-contains-nested-function-references.md"
 
 ## Classes
-
---8<-- "docs/includes/cases/class-method-calls-one-method.md"
 
 --8<-- "docs/includes/cases/class-method-calls-two-methods.md"
 

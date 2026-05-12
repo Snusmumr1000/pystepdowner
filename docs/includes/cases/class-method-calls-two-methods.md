@@ -1,6 +1,6 @@
-### Instance method subject -> two instance method references via direct calls
+### Instance method subject -> one or more instance method references via direct calls
 
-Subject: one instance method. References: two instance methods. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
+Subject: one instance method. References: one or more instance methods. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
 
 Before:
 

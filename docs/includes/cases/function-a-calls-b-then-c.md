@@ -1,6 +1,6 @@
-### Function subject -> two function references via direct calls
+### Function subject -> one or more function references via direct calls
 
-Subject: one module-level function. References: two module-level functions. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
+Subject: one module-level function. References: one or more module-level functions. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
 
 Before:
 
