@@ -346,9 +346,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#function-a-calls-b" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -358,8 +359,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#function-a-calls-b-then-c" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -367,6 +368,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -379,9 +385,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-one-method" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -391,8 +398,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-two-methods" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -402,8 +409,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-static-method" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -413,8 +420,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-instance-and-static-methods" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -422,6 +429,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -468,9 +480,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#function-a-calls-b" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -480,8 +493,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#function-a-calls-b-then-c" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -489,6 +502,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -501,9 +519,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-one-method" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -513,8 +532,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-two-methods" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -524,8 +543,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-static-method" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -535,8 +554,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#class-method-calls-instance-and-static-methods" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -544,6 +563,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -566,7 +590,7 @@
 
 <h1 id="cases">Cases</h1>
 <h2 id="functions">Functions</h2>
-<h2 id="function-a-calls-b">Function A calls B</h2>
+<h3 id="function-a-calls-b">Function A calls B</h3>
 <p><code>pystepdowner</code> moves called functions below their caller.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -584,7 +608,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
 </code></pre></div>
-<h2 id="function-a-calls-b-then-c">Function A calls B then C</h2>
+<h3 id="function-a-calls-b-then-c">Function A calls B then C</h3>
 <p><code>pystepdowner</code> keeps called functions below the caller in call order.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -611,7 +635,7 @@
     <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
 </code></pre></div>
 <h2 id="classes">Classes</h2>
-<h2 id="class-method-calls-one-method">Class method calls one method</h2>
+<h3 id="class-method-calls-one-method">Class method calls one method</h3>
 <p><code>pystepdowner</code> moves a called class method below its caller.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
@@ -629,7 +653,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">format_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;Ada&quot;</span>
 </code></pre></div>
-<h2 id="class-method-calls-two-methods">Class method calls two methods</h2>
+<h3 id="class-method-calls-two-methods">Class method calls two methods</h3>
 <p><code>pystepdowner</code> keeps called class methods below the caller in call order.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
@@ -653,7 +677,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">format_punctuation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;!&quot;</span>
 </code></pre></div>
-<h2 id="class-method-calls-static-method">Class method calls static method</h2>
+<h3 id="class-method-calls-static-method">Class method calls static method</h3>
 <p><code>pystepdowner</code> moves a called static method below its caller.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
@@ -673,7 +697,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">format_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;Ada&quot;</span>
 </code></pre></div>
-<h2 id="class-method-calls-instance-and-static-methods">Class method calls instance and static methods</h2>
+<h3 id="class-method-calls-instance-and-static-methods">Class method calls instance and static methods</h3>
 <p><code>pystepdowner</code> keeps called instance and static methods below the caller in call order.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
