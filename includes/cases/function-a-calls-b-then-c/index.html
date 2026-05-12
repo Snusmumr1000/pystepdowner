@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#function-subject-two-function-references-via-direct-calls" class="md-skip">
+        <a href="#function-subject-one-or-more-function-references-via-direct-calls" class="md-skip">
           Skip to content
         </a>
       
@@ -319,10 +319,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#function-subject-two-function-references-via-direct-calls" class="md-nav__link">
+  <a href="#function-subject-one-or-more-function-references-via-direct-calls" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Function subject -&gt; two function references via direct calls
+        Function subject -&gt; one or more function references via direct calls
       
     </span>
   </a>
@@ -348,8 +348,8 @@
 
   <h1>Function a calls b then c</h1>
 
-<h3 id="function-subject-two-function-references-via-direct-calls">Function subject -&gt; two function references via direct calls</h3>
-<p>Subject: one module-level function. References: two module-level functions. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.</p>
+<h3 id="function-subject-one-or-more-function-references-via-direct-calls">Function subject -&gt; one or more function references via direct calls</h3>
+<p>Subject: one module-level function. References: one or more module-level functions. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
