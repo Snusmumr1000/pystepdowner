@@ -4,9 +4,7 @@ Case names follow the pattern: `{subject kind} subject -> {reference cardinality
 
 ## Functions
 
---8<-- "docs/includes/cases/function-a-calls-b-then-c.md"
-
---8<-- "docs/includes/cases/function-lazy-evaluation-references.md"
+--8<-- "docs/includes/cases/function-references.md"
 
 --8<-- "docs/includes/cases/function-calls-recursive-function-and-helper.md"
 
