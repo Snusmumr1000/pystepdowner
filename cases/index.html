@@ -393,6 +393,50 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#function-subject-two-function-references-via-list-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; two function references via list values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-subject-self-reference-and-helper-reference-via-direct-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; self reference and helper reference via direct calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-subject-one-class-reference-via-annotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; one class reference via annotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-subject-nested-function-references-via-direct-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; nested function references via direct calls
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -448,6 +492,17 @@
     <span class="md-ellipsis">
       
         Instance method subject -&gt; instance method and static method references via direct calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-method-subject-one-class-method-reference-via-direct-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class method subject -&gt; one class method reference via direct call
       
     </span>
   </a>
@@ -549,6 +604,50 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#function-subject-two-function-references-via-list-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; two function references via list values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-subject-self-reference-and-helper-reference-via-direct-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; self reference and helper reference via direct calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-subject-one-class-reference-via-annotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; one class reference via annotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-subject-nested-function-references-via-direct-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function subject -&gt; nested function references via direct calls
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -604,6 +703,17 @@
     <span class="md-ellipsis">
       
         Instance method subject -&gt; instance method and static method references via direct calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-method-subject-one-class-method-reference-via-direct-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class method subject -&gt; one class method reference via direct call
       
     </span>
   </a>
@@ -731,6 +841,119 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
 </code></pre></div>
+<h3 id="function-subject-two-function-references-via-list-values">Function subject -&gt; two function references via list values</h3>
+<p>Subject: one module-level function. References: two module-level functions. Reference form: list values returned without calling. Expected order: subject first, then referenced declarations in list insertion order.</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
+    <span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">handlers</span>
+</code></pre></div>
+<p>After:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
+    <span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">handlers</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
+</code></pre></div>
+<h3 id="function-subject-self-reference-and-helper-reference-via-direct-calls">Function subject -&gt; self reference and helper reference via direct calls</h3>
+<p>Subject: one recursive module-level function. References: itself and one module-level helper function. Reference form: direct calls. Expected order: subject first, then referenced helper declarations in reference order.</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">leaf</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;leaf&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">helper</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">leaf</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">recursive</span><span class="p">(</span><span class="n">items</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">recursive</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">return</span> <span class="n">helper</span><span class="p">()</span>
+</code></pre></div>
+<p>After:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">recursive</span><span class="p">(</span><span class="n">items</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">recursive</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">return</span> <span class="n">helper</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">helper</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">leaf</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">leaf</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;leaf&quot;</span>
+</code></pre></div>
+<h3 id="function-subject-one-class-reference-via-annotation">Function subject -&gt; one class reference via annotation</h3>
+<p>Subject: one module-level function. References: one class. Reference form: parameter annotation. Expected order: subject first, then referenced class declaration.</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</code></pre></div>
+<p>After:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">:</span>
+    <span class="k">pass</span>
+</code></pre></div>
+<h3 id="function-subject-nested-function-references-via-direct-calls">Function subject -&gt; nested function references via direct calls</h3>
+<p>Subject: one module-level function containing local functions. References: nested local functions at multiple nesting levels. Reference form: direct calls. Expected order: each local subject first, then its referenced local declarations.</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">d</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;d&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">e</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">d</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">e</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">b</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">c</span><span class="p">()</span>
+</code></pre></div>
+<p>After:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">b</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">e</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">d</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">d</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;d&quot;</span>
+
+        <span class="k">return</span> <span class="n">e</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">c</span><span class="p">()</span>
+</code></pre></div>
 <h2 id="classes">Classes</h2>
 <h3 id="instance-method-subject-one-instance-method-reference-via-direct-call">Instance method subject -&gt; one instance method reference via direct call</h3>
 <p>Subject: one instance method. References: one instance method. Reference form: direct call. Expected order: subject first, then referenced declaration.</p>
@@ -819,6 +1042,28 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">format_punctuation</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;!&quot;</span>
+</code></pre></div>
+<h3 id="class-method-subject-one-class-method-reference-via-direct-call">Class method subject -&gt; one class method reference via direct call</h3>
+<p>Subject: one class method. References: one class method. Reference form: direct call through <code>cls</code>. Expected order: subject first, then referenced declaration.</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Ada&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">format_name</span><span class="p">()</span><span class="si">}</span><span class="s2">!&quot;</span>
+</code></pre></div>
+<p>After:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">format_name</span><span class="p">()</span><span class="si">}</span><span class="s2">!&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Ada&quot;</span>
 </code></pre></div>
 
 
