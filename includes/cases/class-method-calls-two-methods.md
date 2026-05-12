@@ -1,6 +1,6 @@
-### Class method calls two methods
+### Instance method subject -> two instance method references via direct calls
 
-`pystepdowner` keeps called class methods below the caller in call order.
+Subject: one instance method. References: two instance methods. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
 
 Before:
 

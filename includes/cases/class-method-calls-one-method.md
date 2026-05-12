@@ -1,6 +1,6 @@
-### Class method calls one method
+### Instance method subject -> one instance method reference via direct call
 
-`pystepdowner` moves a called class method below its caller.
+Subject: one instance method. References: one instance method. Reference form: direct call. Expected order: subject first, then referenced declaration.
 
 Before:
 

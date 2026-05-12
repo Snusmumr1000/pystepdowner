@@ -1,6 +1,6 @@
-### Class method calls instance and static methods
+### Instance method subject -> instance method and static method references via direct calls
 
-`pystepdowner` keeps called instance and static methods below the caller in call order.
+Subject: one instance method. References: one instance method and one static method. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
 
 Before:
 

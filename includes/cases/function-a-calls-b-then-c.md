@@ -1,6 +1,6 @@
-### Function A calls B then C
+### Function subject -> two function references via direct calls
 
-`pystepdowner` keeps called functions below the caller in call order.
+Subject: one module-level function. References: two module-level functions. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
 
 Before:
 

@@ -1,6 +1,6 @@
-### Class method calls static method
+### Instance method subject -> one static method reference via direct call
 
-`pystepdowner` moves a called static method below its caller.
+Subject: one instance method. References: one static method. Reference form: direct call. Expected order: subject first, then referenced declaration.
 
 Before:
 
