@@ -5,11 +5,11 @@ Subject: one module-level function. References: one class. Reference form: param
 Before:
 
 ```python
---8<-- "docs_src/cases/function_annotation_references_class/before.py"
+--8<-- "docs/docs_src/cases/function_annotation_references_class/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/function_annotation_references_class/after.py"
+--8<-- "docs/docs_src/cases/function_annotation_references_class/after.py"
 ```

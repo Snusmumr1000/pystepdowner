@@ -5,11 +5,11 @@ Subject: one module-level function containing local functions. References: neste
 Before:
 
 ```python
---8<-- "docs_src/cases/function_contains_nested_function_references/before.py"
+--8<-- "docs/docs_src/cases/function_contains_nested_function_references/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/function_contains_nested_function_references/after.py"
+--8<-- "docs/docs_src/cases/function_contains_nested_function_references/after.py"
 ```

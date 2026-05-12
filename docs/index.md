@@ -11,13 +11,13 @@ The Stepdown Rule states that code should be readable from top to bottom. Every 
 You can install `pystepdowner` as a global CLI tool using `uv` (recommended):
 
 ```bash
---8<-- "docs_src/index/install_uv.sh"
+--8<-- "docs/docs_src/index/install_uv.sh"
 ```
 
 Alternatively, you can install it into any Python environment using standard `pip`:
 
 ```bash
---8<-- "docs_src/index/install_pip.sh"
+--8<-- "docs/docs_src/index/install_pip.sh"
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ The CLI provides two main commands: `fmt` and `rw`.
 Use the `fmt` command to format a single file and output the result to your terminal. This is useful for previewing changes without modifying the actual file.
 
 ```bash
---8<-- "docs_src/index/fmt.sh"
+--8<-- "docs/docs_src/index/fmt.sh"
 ```
 
 ### 2. `rw`: Rewrite Files
@@ -36,19 +36,19 @@ Use the `rw` command to format and rewrite files. You can rewrite a single file 
 
 #### Rewrite a Single File In-Place
 ```bash
---8<-- "docs_src/index/rw_in_place.sh"
+--8<-- "docs/docs_src/index/rw_in_place.sh"
 ```
 
 #### Rewrite a Single File and Save to a New Location
 ```bash
---8<-- "docs_src/index/rw_output.sh"
+--8<-- "docs/docs_src/index/rw_output.sh"
 ```
 
 #### Rewrite an Entire Directory In-Place
 This will recursively find and format all `.py` files inside the target directory.
 
 ```bash
---8<-- "docs_src/index/rw_directory.sh"
+--8<-- "docs/docs_src/index/rw_directory.sh"
 ```
 
 ## Example
@@ -57,12 +57,12 @@ This will recursively find and format all `.py` files inside the target director
 
 **Before:**
 ```python
---8<-- "docs_src/index/example_before.py"
+--8<-- "docs/docs_src/index/example_before.py"
 ```
 
 **After running `pystepdowner rw -i my_script.py`:**
 ```python
---8<-- "docs_src/index/example_after.py"
+--8<-- "docs/docs_src/index/example_after.py"
 ```
 
 ## Features

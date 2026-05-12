@@ -5,11 +5,11 @@ Subject: one module-level function. References: two module-level functions. Refe
 Before:
 
 ```python
---8<-- "docs_src/cases/function_a_calls_b_then_c/before.py"
+--8<-- "docs/docs_src/cases/function_a_calls_b_then_c/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/function_a_calls_b_then_c/after.py"
+--8<-- "docs/docs_src/cases/function_a_calls_b_then_c/after.py"
 ```

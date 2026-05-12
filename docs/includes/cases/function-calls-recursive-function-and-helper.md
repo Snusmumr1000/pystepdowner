@@ -5,11 +5,11 @@ Subject: one recursive module-level function. References: itself and one module-
 Before:
 
 ```python
---8<-- "docs_src/cases/function_calls_recursive_function_and_helper/before.py"
+--8<-- "docs/docs_src/cases/function_calls_recursive_function_and_helper/before.py"
 ```
 
 After:
 
 ```python
---8<-- "docs_src/cases/function_calls_recursive_function_and_helper/after.py"
+--8<-- "docs/docs_src/cases/function_calls_recursive_function_and_helper/after.py"
 ```
