@@ -18,6 +18,8 @@ Case names follow the pattern: `{subject kind} subject -> {reference cardinality
 
 --8<-- "includes/cases/function-annotation-references-class.md"
 
+--8<-- "includes/cases/function-contains-nested-function-references.md"
+
 ## Classes
 
 --8<-- "includes/cases/class-method-calls-one-method.md"
