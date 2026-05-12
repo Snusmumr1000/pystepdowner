@@ -1,6 +1,6 @@
 ### Function subject -> one or more function references
 
-Subject: one module-level function. References: one or more module-level functions. Reference form: direct calls or lazy evaluation. Expected order: subject first, then referenced declarations in their first appearance order.
+Subject: one module-level function. References: one or more module-level functions. Reference form: lazy evaluation. Expected order: subject first, then referenced declarations in their first appearance order.
 
 Before:
 
