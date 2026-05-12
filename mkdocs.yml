@@ -12,6 +12,9 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.snippets
   - pymdownx.superfences
+exclude_docs:
+  - includes/*
+  - docs_src/*
 nav:
   - Main: index.md
   - Cases: cases.md

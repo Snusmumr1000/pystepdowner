@@ -7,8 +7,8 @@ def b() -> str:
 
 
 def a(key: str):
-    # Dictionary lazy evaluation
+    # Lazy evaluation
     d = {"b": b, "c": c}
-    # List lazy evaluation
+    # Lazy evaluation
     l = [b, c]
     return d[key](), l

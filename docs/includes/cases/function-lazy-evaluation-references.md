@@ -1,6 +1,6 @@
-### Function subject -> function references via lazy evaluation (list or dictionary)
+### Function subject -> function references via lazy evaluation
 
-Subject: one module-level function. References: two module-level functions. Reference form: lazy evaluation (list or dictionary values). Expected order: subject first, then referenced declarations in their first appearance order.
+Subject: one module-level function. References: two module-level functions. Reference form: lazy evaluation. Expected order: subject first, then referenced declarations in their first appearance order.
 
 Before:
 
