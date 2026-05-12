@@ -1,5 +1,7 @@
 # Cases
 
+Case names follow the pattern: `{caller kind} caller -> {callee cardinality} {callee kind} callee(s)`.
+
 ## Functions
 
 --8<-- "includes/cases/function-a-calls-b.md"

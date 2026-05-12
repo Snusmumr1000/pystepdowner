@@ -1,6 +1,6 @@
-### Class method calls two methods
+### Instance method caller -> two instance method callees
 
-`pystepdowner` keeps called class methods below the caller in call order.
+Caller: one instance method. Callees: two instance methods. Expected order: caller first, then callees in call order.
 
 Before:
 

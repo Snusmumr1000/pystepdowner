@@ -1,6 +1,6 @@
-### Class method calls one method
+### Instance method caller -> one instance method callee
 
-`pystepdowner` moves a called class method below its caller.
+Caller: one instance method. Callees: one instance method. Expected order: caller first, then callee.
 
 Before:
 

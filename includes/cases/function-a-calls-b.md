@@ -1,6 +1,6 @@
-### Function A calls B
+### Function caller -> one function callee
 
-`pystepdowner` moves called functions below their caller.
+Caller: one module-level function. Callees: one module-level function. Expected order: caller first, then callee.
 
 Before:
 

@@ -1,6 +1,6 @@
-### Class method calls static method
+### Instance method caller -> one static method callee
 
-`pystepdowner` moves a called static method below its caller.
+Caller: one instance method. Callees: one static method. Expected order: caller first, then callee.
 
 Before:
 
