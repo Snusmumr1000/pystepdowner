@@ -9,7 +9,9 @@ theme:
     - navigation.sections
     - content.code.copy
 markdown_extensions:
+  - pymdownx.highlight
   - pymdownx.snippets
+  - pymdownx.superfences
 nav:
   - Main: index.md
   - Cases: cases.md
