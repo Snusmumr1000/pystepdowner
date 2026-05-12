@@ -16,8 +16,8 @@ dependencies = [
 pystepdowner = "pystepdowner.cli.cli:app"
 
 [tool.taskipy.tasks]
-lint = "ruff check . --fix && mypy ."
-format = "pystepdowner rw -i src && ruff format . && ruff check --fix --select I ."
+lint = "ruff check src tests --fix && mypy src tests"
+format = "pystepdowner rw -i src && ruff format src tests && ruff check --fix --select I src tests"
 test = "pytest tests"
 run = "pystepdowner"
 
