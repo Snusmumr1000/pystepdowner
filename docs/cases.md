@@ -7,3 +7,7 @@
 --8<-- "includes/cases/class-method-calls-one-method.md"
 
 --8<-- "includes/cases/class-method-calls-two-methods.md"
+
+--8<-- "includes/cases/class-method-calls-static-method.md"
+
+--8<-- "includes/cases/class-method-calls-instance-and-static-methods.md"
