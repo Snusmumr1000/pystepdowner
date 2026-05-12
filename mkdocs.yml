@@ -8,6 +8,8 @@ theme:
     - navigation.tabs
     - navigation.sections
     - content.code.copy
+markdown_extensions:
+  - pymdownx.snippets
 nav:
   - Main: index.md
   - Cases: cases.md
