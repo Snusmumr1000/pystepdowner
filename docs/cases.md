@@ -1,6 +1,6 @@
 # Cases
 
-Case names follow the pattern: `{caller kind} caller -> {callee cardinality} {callee kind} callee(s)`.
+Case names follow the pattern: `{subject kind} subject -> {reference cardinality} {target kind} reference(s) via {reference form}`.
 
 ## Functions
 

@@ -1,6 +1,6 @@
-### Function caller -> one function callee
+### Function subject -> one function reference via direct call
 
-Caller: one module-level function. Callees: one module-level function. Expected order: caller first, then callee.
+Subject: one module-level function. References: one module-level function. Reference form: direct call. Expected order: subject first, then referenced declaration.
 
 Before:
 

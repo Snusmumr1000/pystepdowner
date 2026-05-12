@@ -1,6 +1,6 @@
-### Instance method caller -> two instance method callees
+### Instance method subject -> two instance method references via direct calls
 
-Caller: one instance method. Callees: two instance methods. Expected order: caller first, then callees in call order.
+Subject: one instance method. References: two instance methods. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
 
 Before:
 

@@ -1,6 +1,6 @@
-### Instance method caller -> one static method callee
+### Instance method subject -> one static method reference via direct call
 
-Caller: one instance method. Callees: one static method. Expected order: caller first, then callee.
+Subject: one instance method. References: one static method. Reference form: direct call. Expected order: subject first, then referenced declaration.
 
 Before:
 

@@ -1,6 +1,6 @@
-### Function caller -> two function callees through dictionary dispatch
+### Function subject -> two function references via dictionary values
 
-Caller: one module-level function with dictionary dispatch by argument key. Callees: two module-level functions referenced in the dictionary. Expected order: caller first, then callees in dictionary insertion order.
+Subject: one module-level function. References: two module-level functions. Reference form: dictionary values selected by argument key. Expected order: subject first, then referenced declarations in dictionary insertion order.
 
 Before:
 
