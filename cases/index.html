@@ -348,6 +348,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#function-a-calls-b-then-c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function A calls B then C
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -393,6 +404,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#function-a-calls-b-then-c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function A calls B then C
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -428,6 +450,32 @@ def a() -&gt; str:
 
 def b() -&gt; str:
     return &quot;b&quot;
+</code></pre>
+<h2 id="function-a-calls-b-then-c">Function A calls B then C</h2>
+<p><code>pystepdowner</code> keeps called functions below the caller in call order.</p>
+<p>Before:</p>
+<pre><code class="language-python">def c() -&gt; str:
+    return &quot;c&quot;
+
+
+def b() -&gt; str:
+    return &quot;b&quot;
+
+
+def a() -&gt; str:
+    return b() + c()
+</code></pre>
+<p>After:</p>
+<pre><code class="language-python">def a() -&gt; str:
+    return b() + c()
+
+
+def b() -&gt; str:
+    return &quot;b&quot;
+
+
+def c() -&gt; str:
+    return &quot;c&quot;
 </code></pre>
 
 
