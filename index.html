@@ -616,61 +616,61 @@
 <p><code>pystepdowner</code> analyzes your Python files and rearranges functions and methods to adhere to this rule, prioritizing source-code call order and correctly handling complex dependency graphs.</p>
 <h2 id="installation">Installation</h2>
 <p>You can install <code>pystepdowner</code> as a global CLI tool using <code>uv</code> (recommended):</p>
-<pre><code class="language-bash"># Install from PyPI
-uv tool install pystepdowner
+<div class="highlight"><pre><span></span><code><span class="c1"># Install from PyPI</span>
+uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>pystepdowner
 
-# Or install from source locally
-uv tool install .
-</code></pre>
+<span class="c1"># Or install from source locally</span>
+uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>.
+</code></pre></div>
 <p>Alternatively, you can install it into any Python environment using standard <code>pip</code>:</p>
-<pre><code class="language-bash">pip install pystepdowner
-</code></pre>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>pystepdowner
+</code></pre></div>
 <h2 id="usage">Usage</h2>
 <p>The CLI provides two main commands: <code>fmt</code> and <code>rw</code>.</p>
 <h3 id="1-fmt-format-and-print-to-output">1. <code>fmt</code>: Format and Print to Output</h3>
 <p>Use the <code>fmt</code> command to format a single file and output the result to your terminal. This is useful for previewing changes without modifying the actual file.</p>
-<pre><code class="language-bash">pystepdowner fmt -i my_script.py
-</code></pre>
+<div class="highlight"><pre><span></span><code>pystepdowner<span class="w"> </span>fmt<span class="w"> </span>-i<span class="w"> </span>my_script.py
+</code></pre></div>
 <h3 id="2-rw-rewrite-files">2. <code>rw</code>: Rewrite Files</h3>
 <p>Use the <code>rw</code> command to format and rewrite files. You can rewrite a single file or an entire directory recursively.</p>
 <h4 id="rewrite-a-single-file-in-place">Rewrite a Single File In-Place</h4>
-<pre><code class="language-bash">pystepdowner rw -i my_script.py
-</code></pre>
+<div class="highlight"><pre><span></span><code>pystepdowner<span class="w"> </span>rw<span class="w"> </span>-i<span class="w"> </span>my_script.py
+</code></pre></div>
 <h4 id="rewrite-a-single-file-and-save-to-a-new-location">Rewrite a Single File and Save to a New Location</h4>
-<pre><code class="language-bash">pystepdowner rw -i my_script.py -o formatted_script.py
-</code></pre>
+<div class="highlight"><pre><span></span><code>pystepdowner<span class="w"> </span>rw<span class="w"> </span>-i<span class="w"> </span>my_script.py<span class="w"> </span>-o<span class="w"> </span>formatted_script.py
+</code></pre></div>
 <h4 id="rewrite-an-entire-directory-in-place">Rewrite an Entire Directory In-Place</h4>
 <p>This will recursively find and format all <code>.py</code> files inside the target directory.</p>
-<pre><code class="language-bash">pystepdowner rw -i src/
-</code></pre>
+<div class="highlight"><pre><span></span><code>pystepdowner<span class="w"> </span>rw<span class="w"> </span>-i<span class="w"> </span>src/
+</code></pre></div>
 <h2 id="example">Example</h2>
 <p><code>pystepdowner</code> transforms bottom-up code into top-down code, putting high-level logic before the helpers it calls.</p>
-<p><strong>Before:</strong></p>
-<pre><code class="language-python">def load_user(user_id: int) -&gt; dict:
-    return {&quot;id&quot;: user_id, &quot;name&quot;: &quot;Alice&quot;}
+<p><strong>Before:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">}</span>
 
 
-def format_user(user: dict) -&gt; str:
-    return f&quot;{user['id']}: {user['name']}&quot;
+<span class="k">def</span><span class="w"> </span><span class="nf">format_user</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
-def user_controller(user_id: int) -&gt; dict:
-    user = load_user(user_id)
-    return {&quot;body&quot;: format_user(user)}
-</code></pre>
-<p><strong>After running <code>pystepdowner rw -i my_script.py</code>:</strong></p>
-<pre><code class="language-python">def user_controller(user_id: int) -&gt; dict:
-    user = load_user(user_id)
-    return {&quot;body&quot;: format_user(user)}
+<span class="k">def</span><span class="w"> </span><span class="nf">user_controller</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">load_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">format_user</span><span class="p">(</span><span class="n">user</span><span class="p">)}</span>
+</code></pre></div></p>
+<p><strong>After running <code>pystepdowner rw -i my_script.py</code>:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">user_controller</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">load_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">format_user</span><span class="p">(</span><span class="n">user</span><span class="p">)}</span>
 
 
-def load_user(user_id: int) -&gt; dict:
-    return {&quot;id&quot;: user_id, &quot;name&quot;: &quot;Alice&quot;}
+<span class="k">def</span><span class="w"> </span><span class="nf">load_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">}</span>
 
 
-def format_user(user: dict) -&gt; str:
-    return f&quot;{user['id']}: {user['name']}&quot;
-</code></pre>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_user</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div></p>
 <h2 id="features">Features</h2>
 <ul>
 <li><strong>Topological Sorting</strong>: Correctly sequences nested function calls and handles mutual recursion.</li>

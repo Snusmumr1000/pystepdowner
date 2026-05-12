@@ -436,51 +436,47 @@
 <h2 id="function-a-calls-b">Function A calls B</h2>
 <p><code>pystepdowner</code> moves called functions below their caller.</p>
 <p>Before:</p>
-<pre><code class="language-python">def b() -&gt; str:
-    return &quot;b&quot;
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
 
 
-def a() -&gt; str:
-    return b()
-
-</code></pre>
+<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">b</span><span class="p">()</span>
+</code></pre></div>
 <p>After:</p>
-<pre><code class="language-python">def a() -&gt; str:
-    return b()
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">b</span><span class="p">()</span>
 
 
-def b() -&gt; str:
-    return &quot;b&quot;
-
-</code></pre>
+<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
+</code></pre></div>
 <h2 id="function-a-calls-b-then-c">Function A calls B then C</h2>
 <p><code>pystepdowner</code> keeps called functions below the caller in call order.</p>
 <p>Before:</p>
-<pre><code class="language-python">def c() -&gt; str:
-    return &quot;c&quot;
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
 
 
-def b() -&gt; str:
-    return &quot;b&quot;
+<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
 
 
-def a() -&gt; str:
-    return b() + c()
-
-</code></pre>
+<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">b</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="p">()</span>
+</code></pre></div>
 <p>After:</p>
-<pre><code class="language-python">def a() -&gt; str:
-    return b() + c()
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">b</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="p">()</span>
 
 
-def b() -&gt; str:
-    return &quot;b&quot;
+<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
 
 
-def c() -&gt; str:
-    return &quot;c&quot;
-
-</code></pre>
+<span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s2">&quot;c&quot;</span>
+</code></pre></div>
 
 
 
