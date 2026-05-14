@@ -1,4 +1,4 @@
-### Function subject -> one or more function references
+### Function subjects - 1:N -> Function reference
 
 Subject: one module-level function. References: one or more module-level functions. Reference form: lazy evaluation. Expected order: subject first, then referenced declarations in their first appearance order.
 
