@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "comments": [
+    {
+      "id": "2dce9e37-9c10-4d20-ac86-83472525e3c7",
+      "location": {
+        "path": "function-references.md",
+        "commit": "b8f0ded12bd54e9ca0c04be7d01936996bd46bf3",
+        "range": {
+          "startLine": 1,
+          "endLine": 1
+        }
+      },
+      "content": {
+        "selectedText": "### Function subject -> one or more function references"
+      },
+      "comment": "Make it like \"Function subjects - 1:N -> Function reference\"",
+      "status": "DONE",
+      "createdAt": "2026-05-14T17:41:46.478Z"
+    }
+  ]
+}
