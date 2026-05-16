@@ -88,10 +88,3 @@ def load_user(user_id: int) -> dict:
 def format_user(user: dict) -> str:
     return f"{user['id']}: {user['name']}"
 ```
-
-## Features
-
-- **Topological Sorting**: Correctly sequences nested function calls and handles mutual recursion.
-- **Class Methods**: Seamlessly reorders methods within a class definition.
-- **Automatic Annotations**: Automatically inserts `from __future__ import annotations` if an annotation dependency is moved below its definition to avoid `NameError`.
-- **Comment Preservation**: Retains module-level and function-level comments in their correct logical blocks.
