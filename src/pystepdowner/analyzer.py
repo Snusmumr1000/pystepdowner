@@ -1,6 +1,6 @@
 import ast
 import itertools
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from typing import Any, cast
 
 from pystepdowner.models import NodeChunk
@@ -56,7 +56,7 @@ def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bo
                 while s > limit and (not (line := new_lines[s - 1].strip()) or line.startswith("#")):
                     s -= 1
                 limit = e + 1
-                calls, ann = _extract_calls(node)
+                calls, ann, eager = _extract_calls(node)
                 starts.append(s)
                 chunks.append(
                     NodeChunk(
@@ -65,6 +65,7 @@ def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bo
                         lines=new_lines[s : e + 1],
                         calls=calls,
                         annotation_calls=ann,
+                        eager_calls=eager,
                     )
                 )
             groups.append((chunks, starts[0], limit - 1))
@@ -101,19 +102,16 @@ def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bo
     return new_lines, modified, needs_future
 
 
-def _extract_calls(node: ast.AST) -> tuple[list[str], list[str]]:
+def _extract_calls(node: ast.AST) -> tuple[list[str], list[str], list[str]]:
     cls = next((getattr(p, "name", None) for p in _walk_parents(node) if isinstance(p, ast.ClassDef)), None)
 
-    def get_pos(n: ast.AST) -> tuple[int, int, str] | None:
+    def get_pos(n: ast.AST, ignore_class_assigns: bool) -> tuple[int, int, str] | None:
         if isinstance(getattr(n, "ctx", None), (ast.Store, ast.Del)):
             return None
-        if isinstance(getattr(n, "parent", None), ast.Assign):
+        if ignore_class_assigns and isinstance(getattr(n, "parent", None), ast.Assign):
             in_func = any(isinstance(p, (ast.FunctionDef, ast.AsyncFunctionDef)) for p in _walk_parents(n))
             if not in_func:
                 return None
-        parent = getattr(n, "parent", None)
-        if isinstance(parent, ast.ClassDef) and parent.bases and parent.bases[0] == n:
-            return None
         if isinstance(n, ast.Name):
             return n.lineno, n.col_offset, n.id
         if isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id in ("self", "cls", cls):
@@ -122,8 +120,9 @@ def _extract_calls(node: ast.AST) -> tuple[list[str], list[str]]:
 
     all_pos: list[tuple[int, int, str]] = []
     ann_pos: list[tuple[int, int, str]] = []
+    eager_pos = _extract_eager_positions(node, get_pos)
     for child in ast.walk(node):
-        if pos := get_pos(child):
+        if pos := get_pos(child, True):
             all_pos.append(pos)
         targets = []
         if isinstance(child, ast.arg) and child.annotation:
@@ -134,13 +133,69 @@ def _extract_calls(node: ast.AST) -> tuple[list[str], list[str]]:
             targets.append(child.annotation)
         for t in targets:
             for n in ast.walk(t):
-                if pos_ann := get_pos(n):
+                if pos_ann := get_pos(n, True):
                     ann_pos.append(pos_ann)
 
     def dedup(items: Iterable[tuple[int, int, str]]) -> list[str]:
         return list(dict.fromkeys(name for _, _, name in sorted(items)))
 
-    return dedup(all_pos), dedup(ann_pos)
+    eager = set(dedup(eager_pos))
+    return [name for name in dedup(all_pos) if name not in eager], dedup(ann_pos), dedup(eager_pos)
+
+
+def _extract_eager_positions(
+    node: ast.AST,
+    get_pos: Callable[[ast.AST, bool], tuple[int, int, str] | None],
+) -> list[tuple[int, int, str]]:
+    targets: list[ast.AST] = []
+
+    def add_function_eager(func: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
+        targets.extend(func.decorator_list)
+        targets.extend(func.args.defaults)
+        targets.extend(default for default in func.args.kw_defaults if default is not None)
+
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        add_function_eager(node)
+    elif isinstance(node, ast.ClassDef):
+        targets.extend(node.decorator_list)
+        targets.extend(node.bases)
+        targets.extend(keyword.value for keyword in node.keywords)
+        for stmt in node.body:
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                add_function_eager(stmt)
+            elif not isinstance(stmt, ast.ClassDef):
+                targets.extend(_class_body_eager_targets(stmt))
+
+    eager_pos: list[tuple[int, int, str]] = []
+    for target in targets:
+        for child in ast.walk(target):
+            if pos := get_pos(child, False):
+                eager_pos.append(pos)
+    return eager_pos
+
+
+def _class_body_eager_targets(stmt: ast.stmt) -> list[ast.AST]:
+    if isinstance(stmt, ast.Assign):
+        return [stmt.value]
+    if isinstance(stmt, ast.AnnAssign):
+        return [stmt.value] if stmt.value else []
+    if isinstance(stmt, ast.AugAssign):
+        return [stmt.value]
+    if isinstance(stmt, ast.Expr):
+        return [stmt.value]
+    if isinstance(stmt, (ast.For, ast.AsyncFor)):
+        return [stmt.iter, *stmt.body, *stmt.orelse]
+    if isinstance(stmt, ast.With):
+        targets: list[ast.AST] = [item.context_expr for item in stmt.items]
+        targets.extend(stmt.body)
+        return targets
+    if isinstance(stmt, ast.AsyncWith):
+        targets = [item.context_expr for item in stmt.items]
+        targets.extend(stmt.body)
+        return targets
+    if isinstance(stmt, ast.If):
+        return [stmt.test, *stmt.body, *stmt.orelse]
+    return [stmt]
 
 
 def _walk_parents(node: ast.AST) -> Iterator[ast.AST]:
@@ -171,6 +226,9 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
     def _dfs(node: NodeChunk) -> None:
         if node.name in visited:
             return
+        for eager in node.eager_calls:
+            if eager in cmap and eager != node.name and eager not in visited:
+                _dfs(cmap[eager])
         if any(c.name != node.name and c.name not in visited and node.name in c.calls and c.name not in reach[node.name] for c in others):
             return
         visited.add(node.name)

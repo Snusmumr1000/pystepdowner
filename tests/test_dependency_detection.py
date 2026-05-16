@@ -70,3 +70,89 @@ class B:
      pass
 """
     assert format_code(source) == expected.strip("\n")
+
+
+def test_given_class_level_default_references_function_when_reformatting_then_function_stays_before_class() -> None:
+    source = """
+def my_func() -> None:
+    pass
+
+
+class Foo:
+    func = my_func
+
+
+def main() -> None:
+    Foo()
+"""
+    expected = """
+def main() -> None:
+    Foo()
+
+
+def my_func() -> None:
+    pass
+
+
+class Foo:
+    func = my_func
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_given_default_argument_references_function_when_reformatting_then_default_stays_defined_first() -> None:
+    source = """
+def formatter(value: str) -> str:
+    return value.upper()
+
+
+def greet(formatter=formatter) -> str:
+    return formatter("hi")
+
+
+def main() -> None:
+    greet()
+"""
+    expected = """
+def main() -> None:
+    greet()
+
+
+def formatter(value: str) -> str:
+    return value.upper()
+
+
+def greet(formatter=formatter) -> str:
+    return formatter("hi")
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_given_decorator_references_function_when_reformatting_then_decorator_stays_defined_first() -> None:
+    source = """
+def my_decorator(func):
+    return func
+
+
+@my_decorator
+def task() -> None:
+    pass
+
+
+def main() -> None:
+    task()
+"""
+    expected = """
+def main() -> None:
+    task()
+
+
+def my_decorator(func):
+    return func
+
+
+@my_decorator
+def task() -> None:
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
