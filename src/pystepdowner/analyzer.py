@@ -143,6 +143,13 @@ def _extract_calls(node: ast.AST) -> tuple[list[str], list[str], list[str]]:
     return [name for name in dedup(all_pos) if name not in eager], dedup(ann_pos), dedup(eager_pos)
 
 
+def _walk_parents(node: ast.AST) -> Iterator[ast.AST]:
+    cur = getattr(node, "parent", None)
+    while cur:
+        yield cur
+        cur = getattr(cur, "parent", None)
+
+
 def _extract_eager_positions(
     node: ast.AST,
     get_pos: Callable[[ast.AST, bool], tuple[int, int, str] | None],
@@ -196,13 +203,6 @@ def _class_body_eager_targets(stmt: ast.stmt) -> list[ast.AST]:
     if isinstance(stmt, ast.If):
         return [stmt.test, *stmt.body, *stmt.orelse]
     return [stmt]
-
-
-def _walk_parents(node: ast.AST) -> Iterator[ast.AST]:
-    cur = getattr(node, "parent", None)
-    while cur:
-        yield cur
-        cur = getattr(cur, "parent", None)
 
 
 def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
