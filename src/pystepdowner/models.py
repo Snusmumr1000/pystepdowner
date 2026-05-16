@@ -10,3 +10,4 @@ class NodeChunk:
     lines: list[str]
     calls: list[str]  # names of local functions/methods called by this chunk
     annotation_calls: list[str]  # names of local functions/methods used in type hints
+    eager_calls: list[str]  # names that must already be defined when this chunk is evaluated
