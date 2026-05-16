@@ -76,6 +76,39 @@ def main(helper) -> None:
     assert format_code(source) == expected.strip("\n")
 
 
+def test_given_duplicate_function_names_when_reformatting_then_chunks_are_not_lost() -> None:
+    source = """
+def helper() -> int:
+    return 1
+
+
+def main() -> int:
+    return helper()
+
+
+def helper() -> int:
+    return 2
+"""
+    expected = source
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_given_duplicate_method_names_when_reformatting_then_chunks_are_not_lost() -> None:
+    source = """
+class A:
+    def helper(self) -> int:
+        return 1
+
+    def main(self) -> int:
+        return self.helper()
+
+    def helper(self) -> int:
+        return 2
+"""
+    expected = source
+    assert format_code(source) == expected.strip("\n")
+
+
 def test_given_type_annotation_dependency_when_reformatting_then_annotated_class_is_treated_as_dependency() -> None:
     source = """
 class B:

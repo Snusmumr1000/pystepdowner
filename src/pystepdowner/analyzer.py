@@ -68,7 +68,8 @@ def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bo
                         eager_calls=eager,
                     )
                 )
-            groups.append((chunks, starts[0], limit - 1))
+            if len({c.name for c in chunks}) == len(chunks):
+                groups.append((chunks, starts[0], limit - 1))
 
     for chunks, start_idx, end_idx in reversed(groups):
         reordered = reorder_chunks(chunks)
