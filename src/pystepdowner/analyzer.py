@@ -238,8 +238,13 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
         for callee in callees:
             _dfs(callee)
 
+    for init in inits:
+        for eager in init.eager_calls:
+            if eager in cmap and eager != init.name and eager not in visited:
+                _dfs(cmap[eager])
+    pre_inits = ordered[:]
     for r in roots:
         _dfs(r)
     for c in others:
         _dfs(c)
-    return inits + ordered
+    return [*pre_inits, *inits, *(c for c in ordered if c not in pre_inits)]

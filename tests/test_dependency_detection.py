@@ -156,3 +156,30 @@ def task() -> None:
     pass
 """
     assert format_code(source) == expected.strip("\n")
+
+
+def test_given_init_default_references_method_when_reformatting_then_dependency_stays_before_init() -> None:
+    source = """
+class A:
+    def helper(self):
+        pass
+
+    def __init__(self, helper=helper):
+        self.helper = helper
+"""
+    expected = source
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_given_init_decorator_references_method_when_reformatting_then_dependency_stays_before_init() -> None:
+    source = """
+class A:
+    def decorate(func):
+        return func
+
+    @decorate
+    def __init__(self):
+        pass
+"""
+    expected = source
+    assert format_code(source) == expected.strip("\n")
