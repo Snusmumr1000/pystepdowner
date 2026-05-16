@@ -67,11 +67,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#function-subject-nested-function-references-via-direct-calls" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -312,25 +307,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#function-subject-nested-function-references-via-direct-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Function subject -&gt; nested function references via direct calls
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -348,8 +324,7 @@
 
   <h1>Function contains nested function references</h1>
 
-<h3 id="function-subject-nested-function-references-via-direct-calls">Function subject -&gt; nested function references via direct calls</h3>
-<p>Subject: one module-level function containing local functions. References: nested local functions at multiple nesting levels. Reference form: direct calls. Expected order: each local subject first, then its referenced local declarations.</p>
+<p>Nested scopes are reordered independently, preserving the same top-down reading flow inside the outer function.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

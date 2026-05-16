@@ -19,7 +19,7 @@
     
     
       
-        <title>Class method calls static method - pystepdowner</title>
+        <title>Eager definition dependencies - pystepdowner</title>
       
     
     
@@ -67,11 +67,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#instance-method-subject-one-static-method-reference-via-direct-call" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -102,7 +97,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Class method calls static method
+              Eager definition dependencies
             
           </span>
         </div>
@@ -312,25 +307,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#instance-method-subject-one-static-method-reference-via-direct-call" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Instance method subject -&gt; one static method reference via direct call
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -346,27 +322,50 @@
 
 
 
-  <h1>Class method calls static method</h1>
+  <h1>Eager definition dependencies</h1>
 
-<h3 id="instance-method-subject-one-static-method-reference-via-direct-call">Instance method subject -&gt; one static method reference via direct call</h3>
-<p>Subject: one instance method. References: one static method. Reference form: direct call. Expected order: subject first, then referenced declaration.</p>
+<p>Some expressions are evaluated immediately: decorators, default arguments, and class-body values. Those dependencies stay above the chunk that needs them, even when a lazy caller can move first.</p>
 <p>Before:</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">format_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;Ada&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">service</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">format_name</span><span class="p">()</span><span class="si">}</span><span class="s2">!&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">instrument</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Service</span><span class="p">:</span>
+    <span class="n">normalizer</span> <span class="o">=</span> <span class="n">normalize</span>
+
+    <span class="nd">@instrument</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalizer</span><span class="o">=</span><span class="n">normalize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">normalizer</span><span class="p">(</span><span class="s2">&quot; ok &quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>After:</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">format_name</span><span class="p">()</span><span class="si">}</span><span class="s2">!&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">service</span><span class="o">.</span><span class="n">handle</span><span class="p">()</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">format_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;Ada&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">instrument</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Service</span><span class="p">:</span>
+    <span class="n">normalizer</span> <span class="o">=</span> <span class="n">normalize</span>
+
+    <span class="nd">@instrument</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalizer</span><span class="o">=</span><span class="n">normalize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">normalizer</span><span class="p">(</span><span class="s2">&quot; ok &quot;</span><span class="p">)</span>
 </code></pre></div>
 
 

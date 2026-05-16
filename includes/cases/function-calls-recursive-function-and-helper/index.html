@@ -67,11 +67,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#function-subject-self-reference-and-helper-reference-via-direct-calls" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -312,25 +307,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#function-subject-self-reference-and-helper-reference-via-direct-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Function subject -&gt; self reference and helper reference via direct calls
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -348,8 +324,7 @@
 
   <h1>Function calls recursive function and helper</h1>
 
-<h3 id="function-subject-self-reference-and-helper-reference-via-direct-calls">Function subject -&gt; self reference and helper reference via direct calls</h3>
-<p>Subject: one recursive module-level function. References: itself and one module-level helper function. Reference form: direct calls. Expected order: subject first, then referenced helper declarations in reference order.</p>
+<p>A recursive function stays first, followed by the non-recursive helpers it reaches.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">leaf</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="s2">&quot;leaf&quot;</span>

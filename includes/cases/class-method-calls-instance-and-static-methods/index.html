@@ -67,11 +67,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#instance-method-subject-instance-method-and-static-method-references-via-direct-calls" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -312,25 +307,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#instance-method-subject-instance-method-and-static-method-references-via-direct-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Instance method subject -&gt; instance method and static method references via direct calls
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -348,8 +324,7 @@
 
   <h1>Class method calls instance and static methods</h1>
 
-<h3 id="instance-method-subject-instance-method-and-static-method-references-via-direct-calls">Instance method subject -&gt; instance method and static method references via direct calls</h3>
-<p>Subject: one instance method. References: one instance method and one static method. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.</p>
+<p>Methods are reordered within the class body. Instance and static method references follow the public method that uses them.</p>
 <p>Before:</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Greeting</span><span class="p">:</span>
     <span class="nd">@staticmethod</span>
