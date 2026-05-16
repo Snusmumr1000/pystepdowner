@@ -64,10 +64,3 @@ This will recursively find and format all `.py` files inside the target director
 ```python
 --8<-- "docs/docs_src/index/example_after.py"
 ```
-
-## Features
-
-- **Topological Sorting**: Correctly sequences nested function calls and handles mutual recursion.
-- **Class Methods**: Seamlessly reorders methods within a class definition.
-- **Automatic Annotations**: Automatically inserts `from __future__ import annotations` if an annotation dependency is moved below its definition to avoid `NameError`.
-- **Comment Preservation**: Retains module-level and function-level comments in their correct logical blocks.
