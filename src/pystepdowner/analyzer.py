@@ -221,15 +221,17 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
         [c for c in others if not indeg[c.name]], key=lambda c: (-sum(1 for x in c.calls if x in cmap and x != c.name), chunks.index(c))
     )
 
-    ordered, visited = [], set()
+    ordered, visited, visiting = [], set(), set()
 
     def _dfs(node: NodeChunk) -> None:
-        if node.name in visited:
+        if node.name in visited or node.name in visiting:
             return
+        visiting.add(node.name)
         for eager in node.eager_calls:
             if eager in cmap and eager != node.name and eager not in visited:
                 _dfs(cmap[eager])
         if any(c.name != node.name and c.name not in visited and node.name in c.calls and c.name not in reach[node.name] for c in others):
+            visiting.remove(node.name)
             return
         visited.add(node.name)
         ordered.append(node)
@@ -237,6 +239,7 @@ def reorder_chunks(chunks: list[NodeChunk]) -> list[NodeChunk]:
         callees.sort(key=lambda c: (sum(1 for o in callees if c.name in reach[o.name]), node.calls.index(c.name)))
         for callee in callees:
             _dfs(callee)
+        visiting.remove(node.name)
 
     for init in inits:
         for eager in init.eager_calls:

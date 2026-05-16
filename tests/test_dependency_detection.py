@@ -183,3 +183,43 @@ class A:
 """
     expected = source
     assert format_code(source) == expected.strip("\n")
+
+
+def test_given_eager_default_cycle_when_reformatting_then_it_does_not_recurse_forever() -> None:
+    source = """
+def a(value=b):
+    pass
+
+
+def b(value=a):
+    pass
+"""
+    expected = """
+def b(value=a):
+    pass
+
+
+def a(value=b):
+    pass
+"""
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_given_class_eager_default_cycle_when_reformatting_then_it_does_not_recurse_forever() -> None:
+    source = """
+class A:
+    def a(self, value=b):
+        pass
+
+    def b(self, value=a):
+        pass
+"""
+    expected = """
+class A:
+    def b(self, value=a):
+        pass
+
+    def a(self, value=b):
+        pass
+"""
+    assert format_code(source) == expected.strip("\n")
