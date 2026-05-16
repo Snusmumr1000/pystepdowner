@@ -6,18 +6,24 @@ The Stepdown Rule states that code should be readable from top to bottom. Every 
 
 `pystepdowner` analyzes your Python files and rearranges functions and methods to adhere to this rule, prioritizing source-code call order and correctly handling complex dependency graphs.
 
+Documentation: https://Snusmumr1000.github.io/pystepdowner/
+
 ## Installation
 
 You can install `pystepdowner` as a global CLI tool using `uv` (recommended):
 
 ```bash
---8<-- "docs/docs_src/index/install_uv.sh"
+# Install from PyPI
+uv tool install pystepdowner
+
+# Or install from source locally
+uv tool install .
 ```
 
 Alternatively, you can install it into any Python environment using standard `pip`:
 
 ```bash
---8<-- "docs/docs_src/index/install_pip.sh"
+pip install pystepdowner
 ```
 
 ## Usage
@@ -28,7 +34,7 @@ The CLI provides two main commands: `fmt` and `rw`.
 Use the `fmt` command to format a single file and output the result to your terminal. This is useful for previewing changes without modifying the actual file.
 
 ```bash
---8<-- "docs/docs_src/index/fmt.sh"
+pystepdowner fmt -i my_script.py
 ```
 
 ### 2. `rw`: Rewrite Files
@@ -36,19 +42,19 @@ Use the `rw` command to format and rewrite files. You can rewrite a single file 
 
 #### Rewrite a Single File In-Place
 ```bash
---8<-- "docs/docs_src/index/rw_in_place.sh"
+pystepdowner rw -i my_script.py
 ```
 
 #### Rewrite a Single File and Save to a New Location
 ```bash
---8<-- "docs/docs_src/index/rw_output.sh"
+pystepdowner rw -i my_script.py -o formatted_script.py
 ```
 
 #### Rewrite an Entire Directory In-Place
 This will recursively find and format all `.py` files inside the target directory.
 
 ```bash
---8<-- "docs/docs_src/index/rw_directory.sh"
+pystepdowner rw -i src/
 ```
 
 ## Example
@@ -57,10 +63,30 @@ This will recursively find and format all `.py` files inside the target director
 
 **Before:**
 ```python
---8<-- "docs/docs_src/index/example_before.py"
+def load_user(user_id: int) -> dict:
+    return {"id": user_id, "name": "Alice"}
+
+
+def format_user(user: dict) -> str:
+    return f"{user['id']}: {user['name']}"
+
+
+def user_controller(user_id: int) -> dict:
+    user = load_user(user_id)
+    return {"body": format_user(user)}
 ```
 
 **After running `pystepdowner rw -i my_script.py`:**
 ```python
---8<-- "docs/docs_src/index/example_after.py"
+def user_controller(user_id: int) -> dict:
+    user = load_user(user_id)
+    return {"body": format_user(user)}
+
+
+def load_user(user_id: int) -> dict:
+    return {"id": user_id, "name": "Alice"}
+
+
+def format_user(user: dict) -> str:
+    return f"{user['id']}: {user['name']}"
 ```

@@ -1,6 +1,4 @@
-### Function subject -> nested function references via direct calls
-
-Subject: one module-level function containing local functions. References: nested local functions at multiple nesting levels. Reference form: direct calls. Expected order: each local subject first, then its referenced local declarations.
+Nested scopes are reordered independently, preserving the same top-down reading flow inside the outer function.
 
 Before:
 

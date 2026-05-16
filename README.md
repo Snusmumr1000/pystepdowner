@@ -6,6 +6,8 @@ The Stepdown Rule states that code should be readable from top to bottom. Every 
 
 `pystepdowner` analyzes your Python files and rearranges functions and methods to adhere to this rule, prioritizing source-code call order and correctly handling complex dependency graphs.
 
+Documentation: https://Snusmumr1000.github.io/pystepdowner/
+
 ## Installation
 
 You can install `pystepdowner` as a global CLI tool using `uv` (recommended):

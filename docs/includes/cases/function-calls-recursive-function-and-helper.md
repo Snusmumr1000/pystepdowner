@@ -1,6 +1,4 @@
-### Function subject -> self reference and helper reference via direct calls
-
-Subject: one recursive module-level function. References: itself and one module-level helper function. Reference form: direct calls. Expected order: subject first, then referenced helper declarations in reference order.
+A recursive function stays first, followed by the non-recursive helpers it reaches.
 
 Before:
 
