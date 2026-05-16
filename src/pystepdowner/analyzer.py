@@ -104,9 +104,12 @@ def _process_body(body: list[ast.stmt], lines: list[str]) -> tuple[list[str], bo
 
 def _extract_calls(node: ast.AST) -> tuple[list[str], list[str], list[str]]:
     cls = next((getattr(p, "name", None) for p in _walk_parents(node) if isinstance(p, ast.ClassDef)), None)
+    local_bindings = _function_bindings(node) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) else set()
 
-    def get_pos(n: ast.AST, ignore_class_assigns: bool) -> tuple[int, int, str] | None:
+    def get_pos(n: ast.AST, ignore_class_assigns: bool, ignore_local_bindings: bool = False) -> tuple[int, int, str] | None:
         if isinstance(getattr(n, "ctx", None), (ast.Store, ast.Del)):
+            return None
+        if ignore_local_bindings and isinstance(n, ast.Name) and n.id in local_bindings:
             return None
         if ignore_class_assigns and isinstance(getattr(n, "parent", None), ast.Assign):
             in_func = any(isinstance(p, (ast.FunctionDef, ast.AsyncFunctionDef)) for p in _walk_parents(n))
@@ -122,7 +125,7 @@ def _extract_calls(node: ast.AST) -> tuple[list[str], list[str], list[str]]:
     ann_pos: list[tuple[int, int, str]] = []
     eager_pos = _extract_eager_positions(node, get_pos)
     for child in ast.walk(node):
-        if pos := get_pos(child, True):
+        if pos := get_pos(child, True, True):
             all_pos.append(pos)
         targets = []
         if isinstance(child, ast.arg) and child.annotation:
@@ -150,9 +153,31 @@ def _walk_parents(node: ast.AST) -> Iterator[ast.AST]:
         cur = getattr(cur, "parent", None)
 
 
+def _function_bindings(func: ast.FunctionDef | ast.AsyncFunctionDef) -> set[str]:
+    names = {arg.arg for args in (func.args.posonlyargs, func.args.args, func.args.kwonlyargs) for arg in args}
+    names.update(arg.arg for arg in (func.args.vararg, func.args.kwarg) if arg)
+
+    def visit(n: ast.AST) -> None:
+        if n is not func and isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                names.add(n.name)
+            return
+        if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store):
+            names.add(n.id)
+        elif isinstance(n, (ast.Import, ast.ImportFrom)):
+            names.update(alias.asname or alias.name.split(".", 1)[0] for alias in n.names)
+        elif isinstance(n, ast.ExceptHandler) and n.name:
+            names.add(n.name)
+        for child in ast.iter_child_nodes(n):
+            visit(child)
+
+    visit(func)
+    return names
+
+
 def _extract_eager_positions(
     node: ast.AST,
-    get_pos: Callable[[ast.AST, bool], tuple[int, int, str] | None],
+    get_pos: Callable[[ast.AST, bool, bool], tuple[int, int, str] | None],
 ) -> list[tuple[int, int, str]]:
     targets: list[ast.AST] = []
 
@@ -176,7 +201,7 @@ def _extract_eager_positions(
     eager_pos: list[tuple[int, int, str]] = []
     for target in targets:
         for child in ast.walk(target):
-            if pos := get_pos(child, False):
+            if pos := get_pos(child, False, False):
                 eager_pos.append(pos)
     return eager_pos
 

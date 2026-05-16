@@ -49,6 +49,33 @@ def cmd2() -> None:
     assert format_code(source) == expected.strip("\n")
 
 
+def test_given_local_name_shadows_function_when_reformatting_then_it_is_not_treated_as_dependency() -> None:
+    source = """
+def helper() -> None:
+    pass
+
+
+def main() -> None:
+    helper = lambda: None
+    helper()
+"""
+    expected = source
+    assert format_code(source) == expected.strip("\n")
+
+
+def test_given_parameter_shadows_function_when_reformatting_then_it_is_not_treated_as_dependency() -> None:
+    source = """
+def helper() -> None:
+    pass
+
+
+def main(helper) -> None:
+    helper()
+"""
+    expected = source
+    assert format_code(source) == expected.strip("\n")
+
+
 def test_given_type_annotation_dependency_when_reformatting_then_annotated_class_is_treated_as_dependency() -> None:
     source = """
 class B:
