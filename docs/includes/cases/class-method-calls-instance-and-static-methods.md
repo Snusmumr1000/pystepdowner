@@ -1,6 +1,4 @@
-### Instance method subject -> instance method and static method references via direct calls
-
-Subject: one instance method. References: one instance method and one static method. Reference form: direct calls. Expected order: subject first, then referenced declarations in reference order.
+Methods are reordered within the class body. Instance and static method references follow the public method that uses them.
 
 Before:
 

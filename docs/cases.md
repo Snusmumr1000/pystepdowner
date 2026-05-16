@@ -1,23 +1,23 @@
 # Cases
 
-Case names follow the pattern: `{subject kind} subject -> {reference cardinality} {target kind} reference(s) via {reference form}`.
+These cases progress from simple function ordering to runtime-sensitive dependencies.
 
-## Functions
+## 1. Function References
 
 --8<-- "docs/includes/cases/function-references.md"
 
+## 2. Recursive Helper Chain
+
 --8<-- "docs/includes/cases/function-calls-recursive-function-and-helper.md"
 
---8<-- "docs/includes/cases/function-annotation-references-class.md"
+## 3. Nested Functions
 
 --8<-- "docs/includes/cases/function-contains-nested-function-references.md"
 
-## Classes
-
---8<-- "docs/includes/cases/class-method-calls-two-methods.md"
-
---8<-- "docs/includes/cases/class-method-calls-static-method.md"
+## 4. Class Methods
 
 --8<-- "docs/includes/cases/class-method-calls-instance-and-static-methods.md"
 
---8<-- "docs/includes/cases/classmethod-calls-classmethod.md"
+## 5. Eager Definition Dependencies
+
+--8<-- "docs/includes/cases/eager-definition-dependencies.md"
