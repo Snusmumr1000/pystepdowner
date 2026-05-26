@@ -8,6 +8,11 @@ The Stepdown Rule states that code should be readable from top to bottom. Every 
 
 More example cases: https://Snusmumr1000.github.io/pystepdowner/
 
+## References
+
+- [The Stepdown Rule](https://dzone.com/articles/the-stepdown-rule)
+- [Stepdown Rule](https://github.com/Geeksltd/Programming.Tips/blob/master/docs/methods/stepdown-rule.md)
+
 ## Installation
 
 You can install `pystepdowner` as a global CLI tool using `uv` (recommended):
